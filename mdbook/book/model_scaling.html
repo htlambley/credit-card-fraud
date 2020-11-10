@@ -1,0 +1,407 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Scaling - Detecting Credit Card Fraud with Machine Learning</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="favicon.png">
+        
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        
+        <link rel="stylesheet" href="css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="intro_background.html"><strong aria-hidden="true">1.1.</strong> Background</a></li><li class="chapter-item expanded "><a href="intro_dataset.html"><strong aria-hidden="true">1.2.</strong> Dataset</a></li></ol></li><li class="chapter-item expanded "><a href="binary_classification.html"><strong aria-hidden="true">2.</strong> Binary Classification</a></li><li class="chapter-item expanded "><a href="eda.html"><strong aria-hidden="true">3.</strong> Exploratory Data Analysis</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="eda_classes.html"><strong aria-hidden="true">3.1.</strong> Imbalanced Classes</a></li><li class="chapter-item expanded "><a href="eda_seasonality.html"><strong aria-hidden="true">3.2.</strong> Seasonality</a></li></ol></li><li class="chapter-item expanded "><a href="model_baseline.html"><strong aria-hidden="true">4.</strong> Baseline Model</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">5.</strong> Refining the Model</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="model_scaling.html" class="active"><strong aria-hidden="true">5.1.</strong> Scaling</a></li><li class="chapter-item expanded "><a href="model_feature_selection.html"><strong aria-hidden="true">5.2.</strong> Feature Selection</a></li><li class="chapter-item expanded "><a href="model_feature_engineering.html"><strong aria-hidden="true">5.3.</strong> Feature Engineering</a></li><li class="chapter-item expanded "><a href="model_ensemble.html"><strong aria-hidden="true">5.4.</strong> Ensembles</a></li></ol></li><li class="chapter-item expanded "><a href="frontiers.html"><strong aria-hidden="true">6.</strong> Frontiers of Machine Learning</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Detecting Credit Card Fraud with Machine Learning</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#scaling" id="scaling">Scaling</a></h1>
+<p>We saw before that the support vector machine method worked reasonably well, but was not an outstanding learner. Applying a scaling transformation to the data might help, in order to prevent features with large variation dominating those that vary little, even if small variations in that feature are actually significant. For example, Hastie et al. advise scaling when using neural network models in [1, § 11.5.3].</p>
+<p>Scaling the features will also mean that, in principle, the coefficients of a linear model should tell us roughly how important each feature is. There are various ways of scaling the data, but we will use scikit-learn's <code>StandardScaler</code> which centres the data (in other words, makes the mean zero) and scales by a constant in order to give each feature a variance of one.</p>
+<p><img src="images/hist_scaling_example.png" alt="Example of scaling. We see the mean of the data is now zero, and variance is one." /></p>
+<p>The above histogram shows an example of using <code>StandardScaler</code> on some random data generated from a distribution. Notice that the mean in the scaled data is now zero, and although the density appears similar, the variance is also much lower.</p>
+<p><small>[1] Trevor Hastie et al. <em>The Elements of Statistical Learning: Data Mining, Inference and Prediction</em>. 1st ed. Springer, New York, NY. (2001) </small></p>
+<h2><a class="header" href="#support-vector-machines-on-scaled-data" id="support-vector-machines-on-scaled-data">Support Vector Machines on Scaled Data</a></h2>
+<pre><code class="language-python">from sklearn.svm import SVC
+from sklearn.model_selection import StratifiedKFold
+from sklearn.metrics import average_precision_score, precision_recall_curve
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from util import load_data, get_confidence
+
+classifier = SVC()
+X, y = load_data()
+
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('clf', classifier)
+])
+
+k_fold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
+print('Average precision score  ')
+print('-------------')
+print('Fold   Score')
+for i, (train_index, test_index) in enumerate(k_fold.split(X, y)):
+    X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
+    y_train, y_test = y[train_index], y[test_index]
+    
+    pipeline.fit(X_train, y_train)
+    y_score = get_confidence(pipeline, X_test)
+    print(f'{i + 1:&lt;6} {average_precision_score(y_test, y_score):.3f}')
+    print()
+
+</code></pre>
+<h3><a class="header" href="#output" id="output">Output</a></h3>
+<pre><code>Average precision score
+-------------
+Fold   Score
+1      0.785
+
+2      0.839
+
+3      0.835
+
+4      0.843
+
+5      0.799
+</code></pre>
+<p>While the support vector machine still doesn't beat the random forest baseline model, it is a great improvement from before, where the area under the precision–recall curve was as poor as 0.561 on fold 4.</p>
+<h2><a class="header" href="#k-nearest-neighbours-on-scaled-data" id="k-nearest-neighbours-on-scaled-data">K Nearest Neighbours on Scaled Data</a></h2>
+<pre><code class="language-python">from sklearn.model_selection import StratifiedKFold
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import average_precision_score, precision_recall_curve
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from util import load_data, get_confidence
+
+X, y = load_data()
+
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('clf', KNeighborsClassifier())
+])
+
+k_fold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
+print('Average precision score  ')
+print('-------------')
+print('Fold   Score')
+for i, (train_index, test_index) in enumerate(k_fold.split(X, y)):
+    X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
+    y_train, y_test = y[train_index], y[test_index]
+    
+    pipeline.fit(X_train, y_train)
+    y_score = get_confidence(pipeline, X_test)
+    print(f'{i + 1:&lt;6} {average_precision_score(y_test, y_score):.3f}')
+    print()
+
+</code></pre>
+<h3><a class="header" href="#output-1" id="output-1">Output</a></h3>
+<pre><code>Average precision score
+-------------
+Fold   Score
+1      0.781
+
+2      0.828
+
+3      0.839
+
+4      0.814
+
+5      0.808
+</code></pre>
+<p>The K Nearest Neighbours model produces another model with performance comparable to the support vector machine model above. For comparison, without scaling the model performs extremely poorly, and achieves a score of 0.137 on fold 1. Therefore, we can see that scaling makes a very significant difference for many models.</p>
+<p>An idea that we will explore later is whether we can combine these different models to construct a more powerful learner. </p>
+<h2><a class="header" href="#neural-networks-on-scaled-data" id="neural-networks-on-scaled-data">Neural Networks on Scaled Data</a></h2>
+<pre><code class="language-python">from sklearn.neural_network import MLPClassifier
+from sklearn.model_selection import StratifiedKFold
+from sklearn.metrics import average_precision_score, precision_recall_curve
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from util import load_data, get_confidence
+
+classifier = MLPClassifier(hidden_layer_sizes=(10,), alpha=0.001, random_state=2)
+X, y = load_data()
+
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('clf', classifier)
+])
+
+k_fold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
+print('Average precision score  ')
+print('-------------')
+print('Fold   Score')
+for i, (train_index, test_index) in enumerate(k_fold.split(X, y)):
+    X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
+    y_train, y_test = y[train_index], y[test_index]
+    
+    pipeline.fit(X_train, y_train)
+    y_score = get_confidence(pipeline, X_test)
+    print(f'{i + 1:&lt;6} {average_precision_score(y_test, y_score):.3f}')
+    print()
+
+</code></pre>
+<h3><a class="header" href="#output-2" id="output-2">Output</a></h3>
+<pre><code>Average precision score
+-------------
+Fold   Score
+1      0.788
+
+2      0.868
+
+3      0.856
+
+4      0.836
+
+5      0.846
+</code></pre>
+<p>This classifier using the multi-layer perceptron has performed well on all folds, and gives the best average precision score on fold 2 of all the classifiers we've seen so far. However, some caution must be exercised. The model appears to be fairly sensitive to the initial random state we choose. Here are the results with <code>random_state=1</code>:</p>
+<pre><code>Average precision score
+-------------
+Fold   Score
+1      0.777
+
+2      0.860
+
+3      0.834
+
+4      0.823
+
+5      0.854
+</code></pre>
+<p>Later, we will discuss <em>regularisation</em> which can, among other things, be used to try and reduce the variance of the model.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="model_baseline.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="model_feature_selection.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="model_baseline.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="model_feature_selection.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+        <!-- Livereload script (if served using the cli tool) -->
+        <script type="text/javascript">
+            var socket = new WebSocket("ws://localhost:3000/__livereload");
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

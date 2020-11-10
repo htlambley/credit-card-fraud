@@ -1,0 +1,277 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Binary Classification - Detecting Credit Card Fraud with Machine Learning</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="favicon.png">
+        
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        
+        <link rel="stylesheet" href="css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="intro_background.html"><strong aria-hidden="true">1.1.</strong> Background</a></li><li class="chapter-item expanded "><a href="intro_dataset.html"><strong aria-hidden="true">1.2.</strong> Dataset</a></li></ol></li><li class="chapter-item expanded "><a href="binary_classification.html" class="active"><strong aria-hidden="true">2.</strong> Binary Classification</a></li><li class="chapter-item expanded "><a href="eda.html"><strong aria-hidden="true">3.</strong> Exploratory Data Analysis</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="eda_classes.html"><strong aria-hidden="true">3.1.</strong> Imbalanced Classes</a></li><li class="chapter-item expanded "><a href="eda_seasonality.html"><strong aria-hidden="true">3.2.</strong> Seasonality</a></li></ol></li><li class="chapter-item expanded "><a href="model_baseline.html"><strong aria-hidden="true">4.</strong> Baseline Model</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">5.</strong> Refining the Model</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="model_scaling.html"><strong aria-hidden="true">5.1.</strong> Scaling</a></li><li class="chapter-item expanded "><a href="model_feature_selection.html"><strong aria-hidden="true">5.2.</strong> Feature Selection</a></li><li class="chapter-item expanded "><a href="model_feature_engineering.html"><strong aria-hidden="true">5.3.</strong> Feature Engineering</a></li><li class="chapter-item expanded "><a href="model_ensemble.html"><strong aria-hidden="true">5.4.</strong> Ensembles</a></li></ol></li><li class="chapter-item expanded "><a href="frontiers.html"><strong aria-hidden="true">6.</strong> Frontiers of Machine Learning</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Detecting Credit Card Fraud with Machine Learning</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#binary-classification" id="binary-classification">Binary Classification</a></h1>
+<p>We'll briefly review the mathematics of the problem in the context of <em>statistical learning theory</em>. This section assumes a basic familiarity with probability theory, distributions and set notation. A thorough reference on the necessary notions in probability is [1].</p>
+<p>We have a dataset consisting of transactions, each of which has \(n\) features and a label to say if that transaction is fraudulent or not. More formally, we are given training data
+\[ D = \Big \{ (x_i, y_i) \Big \} \subset \mathcal{X} \times \mathcal{Y}, \]
+where \(\mathcal{X}\) is the <em>space of features</em>. As we have \(n\) real-valued features, \(\mathcal{X}\) can be thought of as the space of real-valued vectors, i.e. \(\mathcal{X} = \mathbb{R}^n\). The space \(\mathcal{Y}\) is the set of possible labels, which for our <em>binary classification</em> problem means \(\mathcal{Y} = \{0, 1\}\). </p>
+<p>Our goal is to find a suitable classifier — in other words, a function — which we denote \(h \colon \mathcal{X} \to \mathcal{Y}\), based on the training data \(D\). </p>
+<p>We can model these training data as coming from some unknown <em>probability distribution</em> on \(\mathcal{X} \times \mathcal{Y} \). This means that there is some underlying rule that gives the probability of any \( (x, y) \in \mathcal{X} \times \mathcal{Y}\). If we knew this distribution, we could construct a &quot;perfect&quot; classifier, known as the <em>Bayes classifier</em>, which minimises the probability of error. </p>
+<p>There are many distributions where even the Bayes classifier is not completely accurate: suppose \(X \sim \mathrm{Uniform}[0, 1]\) and \(Y \sim \mathrm{Bernoulli}(1/2)\) with \(X\) and \(Y\) independent. Intuitively, \(X\) does not predict \(Y\) at all, so no learner can be constructed that will perform any better than random guessing on the distribution. While we can happily try to fit a model on the training data, this will merely &quot;learn&quot; using the noise in the problem. The Bayes classifier in this case can be constructed by just picking 0 or 1 with equal probability. On the entire distribution, we would expect this classifier to be correct 50% of the time. Any other learner will be worse than this on the distribution.</p>
+<h3><a class="header" href="#risk" id="risk">Risk</a></h3>
+<p>We would like this classifier to <em>generalise well</em> to new data sampled from the distribution. So, given a sample \((x, y) \in \mathcal{X} \times \mathcal{Y} \), we can choose some <em>loss function</em> \( L(h(x), y) \) which measures how badly incorrect the prediction \(h(x)\) is, and define the <em>empirical risk</em> of a classifier given \(m\) points \( \{ (x_i, y_i) \} \) to be</p>
+<p>\[ \hat{R}(h) = \frac1m \sum_{i = 1}^m L(h(x_i), y_i). \]</p>
+<p>The empirical loss gives us the loss on our training data, but we really wish to minimise the loss over the entire distribution. This quantity is known as the <em>(generalisation) risk</em>, \(R(h)\). Let \((X, Y)\) be random variables with the distribution on \(\mathcal{X} \times \mathcal{Y} \). Then the risk is given by
+\[ R(h) = \mathbb{E}\big[L(h(X), Y)\big]. \]</p>
+<h3><a class="header" href="#empirical-risk-minimisation" id="empirical-risk-minimisation">Empirical Risk Minimisation</a></h3>
+<p>We will construct classifiers according to the <em>empirical risk minimisation</em> principle [2, §1.5]. Since we do not know the distribution on \(\mathcal{X} \times \mathcal{Y}\), we cannot directly minimise \(R(h)\). But, under the assumption that the training data are independent realisations from this distribution, the expectation of the empirical risk is in fact the generalisation risk.</p>
+<p>Therefore, we wish to find parameters for any model we construct which minimise the empirical risk, and hope that this leads to a low generalisation risk. </p>
+<h2><a class="header" href="#intuition-on-data-analysis" id="intuition-on-data-analysis">Intuition on Data Analysis</a></h2>
+<p>For \(n \leq 3\), classification can be understood visually: we can plot the points on a graph with their corresponding labels and try to devise a rule which distinguishes each class. In higher dimensions, the idea is the same, but we cannot just plot a graph to understand the geometry of the feature space. </p>
+<p>Many of the algorithms used in machine learning operate on simple principles. Support vector machines, for example, look for a <em>hyperplane</em> to separate the points of each class. If the data are <em>linearly separable</em>, in other words it's possible to find a hyperplane which splits the two groups, linear support vector machines can learn a rule with zero empirical risk.</p>
+<p>K Nearest Neighbours models are equally intuitive: given a point we want to classify, we simply look for \(k\) points nearby, and choose the most common label for all of those points.</p>
+<p>Part of the challenge of data science is to gain similar intuititon for data with tens, or hundreds, of dimensions, and understand the relationships, which may be highly non-linear.</p>
+<p>An interesting visualisation of the links between neural networks and topology is given in [3] which is well worth reading.</p>
+<p><small>[1] Roman Vershynin. <em>High-Dimensional Probability: An Introduction with Applications in Data Science</em>. Cambridge University Press, Cambridge. (2018)</small><br/>
+<small>[2] Vladimir N. Vapnik. <em>The Nature of Statistical Learning Theory</em>. 2nd ed. Springer, New York, NY. (2000)</small><br/>
+<small>[3] Christopher Olah. <em>Neural Networks, Manifolds, and Topology</em>. <a href="https://colah.github.io/posts/2014-03-NN-Manifolds-Topology/">URL</a>. (2014)</small></p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="intro_dataset.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="eda.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="intro_dataset.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="eda.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+        <!-- Livereload script (if served using the cli tool) -->
+        <script type="text/javascript">
+            var socket = new WebSocket("ws://localhost:3000/__livereload");
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

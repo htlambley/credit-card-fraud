@@ -1,0 +1,9 @@
+[book]
+authors = ["htlambley"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Detecting Credit Card Fraud with Machine Learning"
+
+[output.html]
+mathjax-support = true

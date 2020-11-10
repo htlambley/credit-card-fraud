@@ -1,0 +1,476 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Feature Selection - Detecting Credit Card Fraud with Machine Learning</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="favicon.png">
+        
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        
+        <link rel="stylesheet" href="css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="intro_background.html"><strong aria-hidden="true">1.1.</strong> Background</a></li><li class="chapter-item expanded "><a href="intro_dataset.html"><strong aria-hidden="true">1.2.</strong> Dataset</a></li></ol></li><li class="chapter-item expanded "><a href="binary_classification.html"><strong aria-hidden="true">2.</strong> Binary Classification</a></li><li class="chapter-item expanded "><a href="eda.html"><strong aria-hidden="true">3.</strong> Exploratory Data Analysis</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="eda_classes.html"><strong aria-hidden="true">3.1.</strong> Imbalanced Classes</a></li><li class="chapter-item expanded "><a href="eda_seasonality.html"><strong aria-hidden="true">3.2.</strong> Seasonality</a></li></ol></li><li class="chapter-item expanded "><a href="model_baseline.html"><strong aria-hidden="true">4.</strong> Baseline Model</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">5.</strong> Refining the Model</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="model_scaling.html"><strong aria-hidden="true">5.1.</strong> Scaling</a></li><li class="chapter-item expanded "><a href="model_feature_selection.html" class="active"><strong aria-hidden="true">5.2.</strong> Feature Selection</a></li><li class="chapter-item expanded "><a href="model_feature_engineering.html"><strong aria-hidden="true">5.3.</strong> Feature Engineering</a></li><li class="chapter-item expanded "><a href="model_ensemble.html"><strong aria-hidden="true">5.4.</strong> Ensembles</a></li></ol></li><li class="chapter-item expanded "><a href="frontiers.html"><strong aria-hidden="true">6.</strong> Frontiers of Machine Learning</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Detecting Credit Card Fraud with Machine Learning</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#feature-selection" id="feature-selection">Feature Selection</a></h1>
+<p>Not all the features in our dataset contribute equally to the model. In fact, some features may not be any use to the model at all, and simply add noise which could be misinterpreted and overfit upon by the learner.</p>
+<p>Linear models are very straightforward to understand as we can examine the coefficients we have fit. Other models such as neural network classifiers are generally much more difficult to interpret. We will use a variety of methods to determine which features seem to have more predictive power, and try to remove the features which offer little benefit.</p>
+<h2><a class="header" href="#feature-permutation" id="feature-permutation">Feature Permutation</a></h2>
+<p>We can apply a general method to any model in order to test how important a certain feature is. The idea is as follows:</p>
+<ol>
+<li>Construct a learner from the training data.</li>
+<li>Given test data \((x_1, y_1), \dots, (x_n, y_n)\) and a chosen feature \(k\), permute the \(k\)th feature of the samples so that they no longer correspond to the correct sample.</li>
+<li>Measure the drop in score of the learner between the unpermuted and permuted data. </li>
+</ol>
+<p>We can choose any arbitrary scoring method, but we will choose the average precision score to remain consistent with the previous experiments. A large decrease in score indicates that a feature seems important, and little change implies the feature has a small impact on the model. If the score increases, the learner would be more accurate by not considering that feature at all. That might be because it has overfit and learned noise in that feature; this is an issue we should be aware of to ensure our model can generalise.</p>
+<p>A similar approach is discussed in [1], and we use the Python <a href="https://eli5.readthedocs.io/en/latest/">ELI5</a> package to generate the feature importance values. </p>
+<p><small>[1] Leo Breiman. <em>Random Forests</em>. Machine Learning 45, pp. 5–32. (2001) <a href="https://link.springer.com/article/10.1023/A:1010933404324">URL</a></small></p>
+<h3><a class="header" href="#applying-feature-permutations-to-random-forests" id="applying-feature-permutations-to-random-forests">Applying Feature Permutations to Random Forests</a></h3>
+<p>As the random forest models performed best in the baseline model construction, we'll perform feature permutation on these to try and determine which features are proving to be the most influential.</p>
+<p>In the previous section, we discussed using <code>StandardScaler</code> in a pipeline. We won't do this for the below example because in principle, a random forest should not be affected by scaling the variables: the decision rules can easily be adapted by the model without the need to preprocess.</p>
+<pre><code class="language-python">from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import StratifiedKFold
+from sklearn.metrics import average_precision_score
+from eli5 import formatters
+from eli5.sklearn import PermutationImportance
+from util import load_data
+
+# This helper function can be passed to the PermutationImportance instance
+# so the feature importance weights represent the increase/decrease of the 
+# average precision score upon permutation of a given feature.
+def score(clf, X, y):
+    y_score = clf.predict_proba(X)[:, 1]
+    return average_precision_score(y, y_score)
+
+classifier = RandomForestClassifier(n_jobs=-1, random_state=0)
+
+X, y = load_data()
+# Use only the first 10,000 samples to speed up the process. Calculating
+# the feature importances takes a large amount of time because we 
+# must permute each feature and retrain.
+X = X[:10000]
+y = y[:10000]
+
+k_fold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
+for i, (train_index, test_index) in enumerate(k_fold.split(X, y)):
+    X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
+    y_train, y_test = y[train_index], y[test_index]
+    classifier.fit(X_train, y_train)
+    perm = PermutationImportance(classifier, scoring=score).fit(X_test, y_test)
+    # We will create an aggregate feature importance ranking by storing the weights from each fold
+    # as a dataframe and summing them all together.
+    if i == 0:
+        explanations = formatters.explain_weights_df(perm, feature_names=X_train.columns.to_numpy())
+        explanations.set_index('feature', inplace=True)
+    else:
+        explanation = formatters.explain_weights_df(perm, feature_names=X_train.columns.to_numpy())
+        explanation.set_index('feature', inplace=True)
+        explanations = explanations + explanation
+# Output the aggregate feature importances after sorting to show the highest ranked first.
+print(explanations.weight.sort_values(ascending=False))
+</code></pre>
+<h4><a class="header" href="#output" id="output">Output</a></h4>
+<pre><code>feature
+V12       3.402100e-01
+V14       1.212035e-01
+V17       8.958874e-02
+V11       6.773449e-02
+V10       4.367965e-02
+V3        3.511822e-02
+V4        3.028638e-02
+V9        1.818182e-02
+V16       1.515152e-02
+V7        7.878788e-03
+V13       6.060606e-03
+V6        4.545455e-03
+V8        3.636364e-03
+V15       1.616162e-03
+V2        9.090909e-04
+V28       1.554312e-16
+V1        1.332268e-16
+V18       1.110223e-16
+V22       8.881784e-17
+V19       0.000000e+00
+V23       0.000000e+00
+V25       0.000000e+00
+V21      -3.535354e-03
+V24      -4.444444e-03
+Time     -5.050505e-03
+V5       -6.666667e-03
+Amount   -8.080808e-03
+V27      -8.888889e-03
+V20      -9.595960e-03
+V26      -9.595960e-03
+Name: weight, dtype: float64
+</code></pre>
+<p>We can see that over all the folds, the features <code>V12</code>, <code>V14</code>, <code>V17</code>, <code>V11</code> and <code>V10</code> seemed to have the most predictive power. The features <code>V21</code> and the ones below actively harmed our model, and removing them would improve the area under the precision–recall curve.</p>
+<h2><a class="header" href="#regularised-models" id="regularised-models">Regularised Models</a></h2>
+<p>The idea of regularisation is rooted in <a href="https://en.wikipedia.org/wiki/Occam%27s_razor">Occam's razor</a>, or the principle that a simpler explanation should be favoured over a more complex one. This is highly relevant for machine learning models in order to prevent overfitting and extremely complex models.</p>
+<p>We can try to reduce overfitting and unnecessarily complex models by adding a <em>penalty</em> to large weights. In other words, we modify the algorithms we use so that a large weight is considered &quot;worse&quot; than a low weight, given equal performance. The challenge is to obtain the right balance between penalising weights and allowing a sufficiently complex model to explain the data well.</p>
+<p>Two popular regularisations schemes are to use the \( \ell^1 \) and \( \ell^2 \) norms, defined by
+\[ \lVert x \rVert_{\ell^1} = \sum_{i = 1}^n |x_i|, \]
+\[ \lVert x \rVert_{\ell^2} = \Bigg ( \sum_{i = 1}^n x_i^2 \Bigg )^\frac12. \]</p>
+<p>The \(\ell^1\) norm can be seen as penalising any weight, and so we tend to find that optimal values are <em>sparse</em> and contain many zeros. This idea can be exploited in combination with linear regression to find a linear model using a smaller number of coefficients: in effect, selecting the most powerful explanatory features.</p>
+<h3><a class="header" href="#lasso" id="lasso">LASSO</a></h3>
+<p>LASSO is a linear regression model which is broadly similar to the ordinary least squares regression method, with the added condition that the coeffients have a bounded \(\ell^1\) norm. So, the model looks for coefficients of the form
+\[ Y = \beta_0 + \beta_1 X_1 + \cdots + \beta_n X_n, \]
+and tries to minimise the least squares best fit line with the added condition that \( \lVert \beta \rVert_{\ell^1} \leq K\) for some chosen regularisation term \(K\). A more detailed derivation of the LASSO method can be found in [2, §3.4.3].</p>
+<p>We can use a LASSO regression model to suggest which features are most important in the linear regression model too. </p>
+<pre><code class="language-python">import pandas as pd
+from sklearn.linear_model import Lasso
+from sklearn.model_selection import StratifiedKFold
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import average_precision_score
+from util import load_data, get_confidence
+
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('clf', Lasso(alpha=0.005))
+])
+
+X, y = load_data()
+
+print('Average precision score  ')
+print('-------------')
+print('Fold   Score')
+k_fold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
+for i, (train_index, test_index) in enumerate(k_fold.split(X, y)):
+    X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
+    y_train, y_test = y[train_index], y[test_index]
+    pipeline.fit(X_train, y_train)
+    current_coeff = pd.Series(pipeline[1].coef_, X.columns)
+    if i == 0:
+        coeff = current_coeff
+    else:
+        coeff = coeff + current_coeff
+    
+    y_score = get_confidence(pipeline, X_test)
+    print(f'{i + 1:&lt;6} {average_precision_score(y_test, y_score):.3f}')
+print() 
+print(coeff.sort_values(ascending=False))
+</code></pre>
+<h4><a class="header" href="#output-1" id="output-1">Output</a></h4>
+<pre><code>1      0.661
+2      0.747
+3      0.692
+4      0.751
+5      0.690
+
+V11       0.007156
+V4        0.002706
+Amount    0.000000
+V15      -0.000000
+V1       -0.000000
+V2        0.000000
+V5       -0.000000
+V6       -0.000000
+V8        0.000000
+V9       -0.000000
+V13      -0.000000
+V28       0.000000
+Time     -0.000000
+V22       0.000000
+V25       0.000000
+V18      -0.000000
+V19       0.000000
+V27       0.000000
+V20       0.000000
+V26       0.000000
+V21       0.000000
+V23      -0.000000
+V24      -0.000000
+V7       -0.013871
+V3       -0.015057
+V16      -0.015804
+V10      -0.020023
+V12      -0.029102
+V14      -0.037817
+V17      -0.042780
+dtype: float64
+</code></pre>
+<p>A similar story emerges: <code>V17</code>, <code>V14</code>, <code>V11</code>, <code>V12</code> and <code>V4</code> seem to be a few of the most significant features. </p>
+<p><small>[2] Trevor Hastie et al. <em>The Elements of Statistical Learning: Data Mining, Inference and Prediction</em>. 1st ed. Springer, New York, NY. (2001)</small></p>
+<h2><a class="header" href="#dropping-features" id="dropping-features">Dropping Features</a></h2>
+<p>We can try to drop the features that we think are of low importance to see how much this affects the model. If the model improves, or doesn't get much worse, we might decide to choose the simpler model. </p>
+<p>Using scikit-learn's <code>SelectFromModel</code> we can programmatically choose which features are worth keeping.</p>
+<pre><code class="language-python">import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+from sklearn.linear_model import Lasso
+from sklearn.model_selection import StratifiedKFold
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.feature_selection import SelectFromModel
+from sklearn.metrics import average_precision_score
+from util import load_data, get_confidence
+
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('select', SelectFromModel(Lasso(alpha=0.005))),
+    ('clf', SVC())
+])
+
+X, y = load_data()
+
+print('Average precision score  ')
+print('-------------')
+print('Fold   Score')
+k_fold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
+for i, (train_index, test_index) in enumerate(k_fold.split(X, y)):
+    X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
+    y_train, y_test = y[train_index], y[test_index]
+    pipeline.fit(X_train, y_train)
+
+    y_score = get_confidence(pipeline, X_test)
+    print(f'{i + 1:&lt;6} {average_precision_score(y_test, y_score):.3f}')
+</code></pre>
+<h3><a class="header" href="#output-2" id="output-2">Output</a></h3>
+<pre><code>Average precision score
+-------------
+Fold   Score
+1      0.795
+2      0.830
+3      0.835
+4      0.839
+5      0.801
+</code></pre>
+<p>The support vector machine doesn't seem to have been affected much by the dropping of low importance features. We might want to keep this simpler model.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="model_scaling.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="model_feature_engineering.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="model_scaling.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="model_feature_engineering.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+        <!-- Livereload script (if served using the cli tool) -->
+        <script type="text/javascript">
+            var socket = new WebSocket("ws://localhost:3000/__livereload");
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

@@ -1,0 +1,283 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Imbalanced Classes - Detecting Credit Card Fraud with Machine Learning</title>
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="favicon.png">
+        
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        
+        <link rel="stylesheet" href="css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="intro_background.html"><strong aria-hidden="true">1.1.</strong> Background</a></li><li class="chapter-item expanded "><a href="intro_dataset.html"><strong aria-hidden="true">1.2.</strong> Dataset</a></li></ol></li><li class="chapter-item expanded "><a href="binary_classification.html"><strong aria-hidden="true">2.</strong> Binary Classification</a></li><li class="chapter-item expanded "><a href="eda.html"><strong aria-hidden="true">3.</strong> Exploratory Data Analysis</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="eda_classes.html" class="active"><strong aria-hidden="true">3.1.</strong> Imbalanced Classes</a></li><li class="chapter-item expanded "><a href="eda_seasonality.html"><strong aria-hidden="true">3.2.</strong> Seasonality</a></li></ol></li><li class="chapter-item expanded "><a href="model_baseline.html"><strong aria-hidden="true">4.</strong> Baseline Model</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">5.</strong> Refining the Model</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="model_scaling.html"><strong aria-hidden="true">5.1.</strong> Scaling</a></li><li class="chapter-item expanded "><a href="model_feature_selection.html"><strong aria-hidden="true">5.2.</strong> Feature Selection</a></li><li class="chapter-item expanded "><a href="model_feature_engineering.html"><strong aria-hidden="true">5.3.</strong> Feature Engineering</a></li><li class="chapter-item expanded "><a href="model_ensemble.html"><strong aria-hidden="true">5.4.</strong> Ensembles</a></li></ol></li><li class="chapter-item expanded "><a href="frontiers.html"><strong aria-hidden="true">6.</strong> Frontiers of Machine Learning</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Detecting Credit Card Fraud with Machine Learning</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#imbalanced-classes" id="imbalanced-classes">Imbalanced Classes</a></h1>
+<p>In this dataset, the <code>Class</code> feature tells us which transactions were deemed to be fraudulent, denoted class 1, and which were deemed genuine, denoted class 0. We can very quickly see that there are vastly more genuine transactions in the dataset than fraudulent ones.</p>
+<p><img src="images/class_balance.png" alt="Pie chart showing class balance (approximately 99.8% genuine)" /></p>
+<p>In the vast majority of cases, we will not be able to collect an equal number of points from each class. More unusual events such as spam or fraud are bound to show up less in data that we collect in a random sample. Very often, however, we care a lot more about the unusual events than the usual ones. [1]</p>
+<p>When classes are very imbalanced, we should be aware of what can go wrong.</p>
+<p><small>[1] Gary M. Weiss. &quot;Foundations of Imbalanced Learning&quot;. In: <em>Imbalanced Learning: Foundations, Algorithms, and Applications</em>. 1st ed. Wiley, Hoboken, NJ. (2013)</small></p>
+<h2><a class="header" href="#accuracy" id="accuracy">Accuracy</a></h2>
+<p>In a binary classification problem with imbalanced classes, we can very easily make a classifier that sounds impressive but is in fact trivial. Suppose we'd like to construct a spam filter, and we know that approximately 90% of emails received are not spam. Then by constructing a classifier that considers every e-mail to be genuine, we can attain an <em>accuracy</em> of 90%. It isn't hard to see that this is hugely misleading, because the spam filter does absolutely nothing.</p>
+<p>On our highly imbalanced dataset, the figures are even more misleading: we can attain an accuracy on the test set of about 99.8% by always labelling a transaction as genuine! It is clear that we need a different metric, because the difference between a bad classifier and the best possible classifier is just a change of 0.2% in the accuracy.</p>
+<p>In fact, giving the problem some thought, we realise that the good classifiers in this problem would be a compromise between finding as many of the fraudulent cases as possible, and keeping the number of false positives as low as possible. The former can be measured by the <em>precision</em> metric. Recall that, in our context, this represents the number of fraud predictions that actually were fraud. This takes values between 0 (every case we flagged as fraud was actually genuine) and 1 (every case we flagged as fraud was fraudulent). Ideally, we want this to be as high as we can get. </p>
+<p>The latter can be measured by <em>recall</em> of a classifier. This represents the fraction of fraudulent cases in the dataset that we correctly identify, and could also be called the <em>true positive rate</em>. Again, this takes values between 0 and 1, and we can trivially obtain a value of 1 by identifying every transaction as fraudulent. Such a classifier would have very low (but non-zero) precision as most of its predictions were wrong.</p>
+<p>While we are talking about binary classification (i.e. building a model to decide whether a transaction is <em>fraud</em> or <em>genuine</em>), the models we will explore don't simply give a value on the dichotomy. Instead, they use some sort of decision function or threshold. If we vary this cutoff, we can achieve different levels of precision and recall; for example, we might be able to sacrifice some precision but correctly recall a higher percentage of fraudulent transactions. These choices can be explored using the <em>precision–recall curve</em> and the <em>receiver operating characteristic curve</em>.</p>
+<h3><a class="header" href="#metrics" id="metrics">Metrics</a></h3>
+<p>Let \(h \colon \mathcal{X} \to \mathcal{Y} = \{0, 1\}\) be a classifier. We can formally define the recall metric with respect to a set of data \(D = \{ (x_1, y_1), \dots, (x_n, y_n) \}\) as
+\[ \mathrm{Recall}(h; D) = \sum_{i = 1}^n \frac{\mathbf{1} \{ h(x_i) = 1 \cap y_i = 1\}}{\mathbf{1} \{ y_i = 1\}}.\]
+Likewise, precision is defined as
+\[ \mathrm{Precision}(h; D) = \sum_{i = 1}^n \frac{\mathbf{1} \{ h(x_i) = 1 \cap y_i = 1\}}{\mathbf{1} \{ h(x_i) = 1\}}.\]
+In other words, precision estimates the probability that if \(Y = 1\) given \(h(X) = 1\). Recall estimates the probability that a given fraudulent transaction is detected.</p>
+<h3><a class="header" href="#roc-and-precisionrecall" id="roc-and-precisionrecall">ROC and Precision–Recall</a></h3>
+<p>The <em>receiver operating characteristic</em> (ROC) curve for a classifier compares the true and false positive rate for different thresholds of the classifier. The graph plots the false positive rate on the x-axis against the true positive rate on the y-axis, and the ideal classifier is represented by the point (0, 1). </p>
+<p>The <em>precision–recall</em> curve for a classifier plots the recall on the x-axis against the precision on the y-axis. The ideal classifier in this case is represented by the point (1, 1). Poor classifiers are ones with low precision or low recall. </p>
+<p>In fact, the two curves are rather intimately related [2]. If a classifier <em>dominates</em> the precision–recall space, in other words if the curve lies strictly above any other curve at all points, then it also dominates in ROC space. There is some debate whether the ROC curve or precision–recall curve should be preferred on imbalanced binary classification problems [3].</p>
+<p>Here are some examples of ROC and precision–recall curves. These were <strong>not</strong> generated from the same dataset, but give an idea of what to expect when plotting these curves for two different classifiers.</p>
+<p><img src="images/roc.png" alt="Example ROC curve comparing two classifiers" /></p>
+<p><img src="images/pr.png" alt="Example precision–recall curve comparing two classifiers" /></p>
+<p><small>[2] Jesse Davis and Mark Goadrich. &quot;The relationship between Precision-Recall and ROC curves&quot;. In: <i>Proceedings of the 23rd international conference on Machine learning</i> (<i>ICML '06</i>). Association for Computing Machinery, New York, NY, USA, pp. 233–240.  (2006). <a href="https://doi.org/10.1145/1143844.1143874">DOI</a></small><br/>
+<small>[3] Takaya Saito and Marc Rehmsmeier. <em>The precision-recall plot is more informative than the ROC plot when evaluating binary classifiers on imbalanced datasets</em>. PloS One 10.3, e0118432. (2015). <a href="https://doi.org/10.1371/journal.pone.0118432">DOI</a>.</small></p>
+<h2><a class="header" href="#models" id="models">Models</a></h2>
+<p>Imbalanced classes can be more difficult to learn for some models. An example of a model that might struggle is a \(k\)-nearest-neighbour classifier [4]. Depending on the geometry of the dataset, the larger class may dominate any predictions simply because there are so many more, but if we had a more balanced set, the minority class would be more easily predicted. </p>
+<p>There are often adaptations to the models we use which are intended to be able to deal with imbalanced classes more easily, such as weighting the neighbours as proposed in [4]. As discussed in the final section of the book, there are other approaches we could consider in order to balance the dataset in a model-agnostic way, such as <em>oversampling</em> or synthetic generation of new data.</p>
+<p><small>[4] Songbo Tan. <em>Neighbor-weighted K-nearest neighbor for unbalanced text corpus</em>. Expert Systems with Applications 28.4, pp. 667–671. <a href="https://doi.org/10.1016/j.eswa.2004.12.0230">DOI</a>. (2005).</small></p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="eda.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="eda_seasonality.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a rel="prev" href="eda.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a rel="next" href="eda_seasonality.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+        <!-- Livereload script (if served using the cli tool) -->
+        <script type="text/javascript">
+            var socket = new WebSocket("ws://localhost:3000/__livereload");
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

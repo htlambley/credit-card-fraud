@@ -1,0 +1,1358 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Detecting Credit Card Fraud with Machine Learning</title>
+        
+        <meta name="robots" content="noindex" />
+        
+        
+
+
+        <!-- Custom HTML head -->
+        
+
+
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        
+        <link rel="icon" href="favicon.svg">
+        
+        
+        <link rel="shortcut icon" href="favicon.png">
+        
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        
+        <link rel="stylesheet" href="css/print.css" media="print">
+        
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        
+        <link rel="stylesheet" href="fonts/fonts.css">
+        
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+        <!-- MathJax -->
+        <script async type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        
+    </head>
+    <body>
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="intro_background.html"><strong aria-hidden="true">1.1.</strong> Background</a></li><li class="chapter-item expanded "><a href="intro_dataset.html"><strong aria-hidden="true">1.2.</strong> Dataset</a></li></ol></li><li class="chapter-item expanded "><a href="binary_classification.html"><strong aria-hidden="true">2.</strong> Binary Classification</a></li><li class="chapter-item expanded "><a href="eda.html"><strong aria-hidden="true">3.</strong> Exploratory Data Analysis</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="eda_classes.html"><strong aria-hidden="true">3.1.</strong> Imbalanced Classes</a></li><li class="chapter-item expanded "><a href="eda_seasonality.html"><strong aria-hidden="true">3.2.</strong> Seasonality</a></li></ol></li><li class="chapter-item expanded "><a href="model_baseline.html"><strong aria-hidden="true">4.</strong> Baseline Model</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">5.</strong> Refining the Model</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="model_scaling.html"><strong aria-hidden="true">5.1.</strong> Scaling</a></li><li class="chapter-item expanded "><a href="model_feature_selection.html"><strong aria-hidden="true">5.2.</strong> Feature Selection</a></li><li class="chapter-item expanded "><a href="model_feature_engineering.html"><strong aria-hidden="true">5.3.</strong> Feature Engineering</a></li><li class="chapter-item expanded "><a href="model_ensemble.html"><strong aria-hidden="true">5.4.</strong> Ensembles</a></li></ol></li><li class="chapter-item expanded "><a href="frontiers.html"><strong aria-hidden="true">6.</strong> Frontiers of Machine Learning</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                        
+                    </div>
+
+                    <h1 class="menu-title">Detecting Credit Card Fraud with Machine Learning</h1>
+
+                    <div class="right-buttons">
+                        
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        
+                        
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1><a class="header" href="#introduction" id="introduction">Introduction</a></h1>
+<p>This book gives an overview of using machine learning techniques to classify a dataset of <strong>credit card transactions</strong> to try and detect fraudulent transactions. </p>
+<p>We will be using Python and the scikit-learn package [1] in our analysis. Many of the ideas we discuss can be explored in much greater detail in the references given in each section—many of the topics discussed here will only be covered in brief, but the literature is vast and rich on machine learning, growing rapidly each day.</p>
+<p><small>[1] Pedregosa et al. <em>Scikit-learn: Machine Learning in Python</em>. Journal of Machine Learning Research 12, pp. 2825–2830. (2011)</small></p>
+<h3><a class="header" href="#assumed-knowledge" id="assumed-knowledge">Assumed Knowledge</a></h3>
+<ul>
+<li>We'll be using Python, so a familiarity with the language is helpful.</li>
+<li>In order to discuss the algorithms and statistical techniques, we'll be using standard mathematical concepts and notation. We'll try to be rigorous but also explore the intuitive ideas behind the algorithms, most of which can be understood quite well graphically.</li>
+</ul>
+<h3><a class="header" href="#goals" id="goals">Goals</a></h3>
+<p>By the end of this book, we will have constructed a classifier using modern techniques that can achieve high accuracy in detecting fraud on the data we use. On the way, we'll discuss many interesting topics in machine learning and statistical analysis.</p>
+<h3><a class="header" href="#licence" id="licence">Licence</a></h3>
+<p>For the most recent copy of this book, see <a href="https://github.com/htlambley">https://github.com/htlambley</a>.</p>
+<p>I release all work in this book into the public domain as given by the <a href="https://unlicense.org/">Unlicense</a>. All images in this book were generated by myself using Python's <a href="https://matplotlib.org/">matplotlib</a>. </p>
+<p>The <a href="https://www.kaggle.com/mlg-ulb/creditcardfraud">dataset</a> is used under the <a href="https://opendatacommons.org/licenses/dbcl/1-0/">Database Contents License v1.0</a> and the rights remain with the Machine Learning Group, Université Libre de Bruxelles.</p>
+<h2><a class="header" href="#background" id="background">Background</a></h2>
+<p>In the UK, fraud losses totalled £620.6 million in 2019, with 2,745,539 recorded incidents occurring in that year alone [1, p. 13]. Over 98% of these losses were absorbed by banks and card issuers, and the remaining losses were paid by cardholders. </p>
+<p>These losses represent a huge problem in the form of lost profit and increased overhead costs for cardholders. Even small advances in the accuracy of fraud detection systems would cut down on these losses.</p>
+<p>There is certainly opportunity for improvement: while £999.2 million of fraudulent transactions were prevented by banks [1], this only accounts for about 62% of losses.</p>
+<p><img src="images/fraud_proportion.png" alt="Proportion of fraud in the UK in 2019. Pie chart shows 38.3% (£620.6 million) not prevented." /></p>
+<p>If one further percentage point of fraud could be prevented, this would reduce fraud losses by approximately £16 million (as of 2019) [1]. </p>
+<p>On the other hand, the savings in reduced fraud may not be worth it if this leads to increased payment friction. Inconvenience and declined card transactions also lead to lost business, so a compromise is needed.</p>
+<p><small>[1] UK Finance. <i>Fraud — The Facts 2020</i>. <a href="https://www.ukfinance.org.uk/system/files/Fraud-The-Facts-2020-FINAL-ONLINE-11-June.pdf">URL</a>.</small></p>
+<h2><a class="header" href="#dataset" id="dataset">Dataset</a></h2>
+<p>We will study the <a href="https://www.kaggle.com/mlg-ulb/creditcardfraud">Credit Card Fraud</a> dataset and construct a model to detect fraudulent payments. This dataset was collected by <a href="https://uk.worldline.com/">Worldline</a> the <a href="https://mlg.ulb.ac.be/">Machine Learning Group</a> at the Université Libre de Bruxelles and later published on the data science platform <a href="https://kaggle.com">Kaggle</a>. We will start by viewing the first few rows of the dataset and getting a flavour of the information we have to work with.</p>
+<pre><code class="language-python">X, y = load_data()
+X.head()
+</code></pre>
+<div style="overflow-x: scroll">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Time</th>
+      <th>V1</th>
+      <th>V2</th>
+      <th>V3</th>
+      <th>V4</th>
+      <th>V5</th>
+      <th>V6</th>
+      <th>V7</th>
+      <th>V8</th>
+      <th>V9</th>
+      <th>...</th>
+      <th>V21</th>
+      <th>V22</th>
+      <th>V23</th>
+      <th>V24</th>
+      <th>V25</th>
+      <th>V26</th>
+      <th>V27</th>
+      <th>V28</th>
+      <th>Amount</th>
+      <th>Class</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.0</td>
+      <td>-1.359807</td>
+      <td>-0.072781</td>
+      <td>2.536347</td>
+      <td>1.378155</td>
+      <td>-0.338321</td>
+      <td>0.462388</td>
+      <td>0.239599</td>
+      <td>0.098698</td>
+      <td>0.363787</td>
+      <td>...</td>
+      <td>-0.018307</td>
+      <td>0.277838</td>
+      <td>-0.110474</td>
+      <td>0.066928</td>
+      <td>0.128539</td>
+      <td>-0.189115</td>
+      <td>0.133558</td>
+      <td>-0.021053</td>
+      <td>149.62</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.0</td>
+      <td>1.191857</td>
+      <td>0.266151</td>
+      <td>0.166480</td>
+      <td>0.448154</td>
+      <td>0.060018</td>
+      <td>-0.082361</td>
+      <td>-0.078803</td>
+      <td>0.085102</td>
+      <td>-0.255425</td>
+      <td>...</td>
+      <td>-0.225775</td>
+      <td>-0.638672</td>
+      <td>0.101288</td>
+      <td>-0.339846</td>
+      <td>0.167170</td>
+      <td>0.125895</td>
+      <td>-0.008983</td>
+      <td>0.014724</td>
+      <td>2.69</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.0</td>
+      <td>-1.358354</td>
+      <td>-1.340163</td>
+      <td>1.773209</td>
+      <td>0.379780</td>
+      <td>-0.503198</td>
+      <td>1.800499</td>
+      <td>0.791461</td>
+      <td>0.247676</td>
+      <td>-1.514654</td>
+      <td>...</td>
+      <td>0.247998</td>
+      <td>0.771679</td>
+      <td>0.909412</td>
+      <td>-0.689281</td>
+      <td>-0.327642</td>
+      <td>-0.139097</td>
+      <td>-0.055353</td>
+      <td>-0.059752</td>
+      <td>378.66</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.0</td>
+      <td>-0.966272</td>
+      <td>-0.185226</td>
+      <td>1.792993</td>
+      <td>-0.863291</td>
+      <td>-0.010309</td>
+      <td>1.247203</td>
+      <td>0.237609</td>
+      <td>0.377436</td>
+      <td>-1.387024</td>
+      <td>...</td>
+      <td>-0.108300</td>
+      <td>0.005274</td>
+      <td>-0.190321</td>
+      <td>-1.175575</td>
+      <td>0.647376</td>
+      <td>-0.221929</td>
+      <td>0.062723</td>
+      <td>0.061458</td>
+      <td>123.50</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2.0</td>
+      <td>-1.158233</td>
+      <td>0.877737</td>
+      <td>1.548718</td>
+      <td>0.403034</td>
+      <td>-0.407193</td>
+      <td>0.095921</td>
+      <td>0.592941</td>
+      <td>-0.270533</td>
+      <td>0.817739</td>
+      <td>...</td>
+      <td>-0.009431</td>
+      <td>0.798278</td>
+      <td>-0.137458</td>
+      <td>0.141267</td>
+      <td>-0.206010</td>
+      <td>0.502292</td>
+      <td>0.219422</td>
+      <td>0.215153</td>
+      <td>69.99</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p>Some immediate observations:</p>
+<ul>
+<li>All the data is numeric, which means it will be very easy to input this into standard machine learning models.</li>
+<li>The only columns with an obvious name are <code>Time</code>, <code>Amount</code> and <code>Class</code>. In fact, the remaining features in this dataset are the result of <a href="https://en.wikipedia.org/wiki/Principal_component_analysis">Principal Component Analysis</a> which was done by the authors of the dataset. This ensures the privacy of the cardholders involved in the dataset, but means we cannot apply any outside knowledge to these features as we do not know the transformation applied.</li>
+</ul>
+<h1><a class="header" href="#binary-classification" id="binary-classification">Binary Classification</a></h1>
+<p>We'll briefly review the mathematics of the problem in the context of <em>statistical learning theory</em>. This section assumes a basic familiarity with probability theory, distributions and set notation. A thorough reference on the necessary notions in probability is [1].</p>
+<p>We have a dataset consisting of transactions, each of which has \(n\) features and a label to say if that transaction is fraudulent or not. More formally, we are given training data
+\[ D = \Big \{ (x_i, y_i) \Big \} \subset \mathcal{X} \times \mathcal{Y}, \]
+where \(\mathcal{X}\) is the <em>space of features</em>. As we have \(n\) real-valued features, \(\mathcal{X}\) can be thought of as the space of real-valued vectors, i.e. \(\mathcal{X} = \mathbb{R}^n\). The space \(\mathcal{Y}\) is the set of possible labels, which for our <em>binary classification</em> problem means \(\mathcal{Y} = \{0, 1\}\). </p>
+<p>Our goal is to find a suitable classifier — in other words, a function — which we denote \(h \colon \mathcal{X} \to \mathcal{Y}\), based on the training data \(D\). </p>
+<p>We can model these training data as coming from some unknown <em>probability distribution</em> on \(\mathcal{X} \times \mathcal{Y} \). This means that there is some underlying rule that gives the probability of any \( (x, y) \in \mathcal{X} \times \mathcal{Y}\). If we knew this distribution, we could construct a &quot;perfect&quot; classifier, known as the <em>Bayes classifier</em>, which minimises the probability of error. </p>
+<p>There are many distributions where even the Bayes classifier is not completely accurate: suppose \(X \sim \mathrm{Uniform}[0, 1]\) and \(Y \sim \mathrm{Bernoulli}(1/2)\) with \(X\) and \(Y\) independent. Intuitively, \(X\) does not predict \(Y\) at all, so no learner can be constructed that will perform any better than random guessing on the distribution. While we can happily try to fit a model on the training data, this will merely &quot;learn&quot; using the noise in the problem. The Bayes classifier in this case can be constructed by just picking 0 or 1 with equal probability. On the entire distribution, we would expect this classifier to be correct 50% of the time. Any other learner will be worse than this on the distribution.</p>
+<h3><a class="header" href="#risk" id="risk">Risk</a></h3>
+<p>We would like this classifier to <em>generalise well</em> to new data sampled from the distribution. So, given a sample \((x, y) \in \mathcal{X} \times \mathcal{Y} \), we can choose some <em>loss function</em> \( L(h(x), y) \) which measures how badly incorrect the prediction \(h(x)\) is, and define the <em>empirical risk</em> of a classifier given \(m\) points \( \{ (x_i, y_i) \} \) to be</p>
+<p>\[ \hat{R}(h) = \frac1m \sum_{i = 1}^m L(h(x_i), y_i). \]</p>
+<p>The empirical loss gives us the loss on our training data, but we really wish to minimise the loss over the entire distribution. This quantity is known as the <em>(generalisation) risk</em>, \(R(h)\). Let \((X, Y)\) be random variables with the distribution on \(\mathcal{X} \times \mathcal{Y} \). Then the risk is given by
+\[ R(h) = \mathbb{E}\big[L(h(X), Y)\big]. \]</p>
+<h3><a class="header" href="#empirical-risk-minimisation" id="empirical-risk-minimisation">Empirical Risk Minimisation</a></h3>
+<p>We will construct classifiers according to the <em>empirical risk minimisation</em> principle [2, §1.5]. Since we do not know the distribution on \(\mathcal{X} \times \mathcal{Y}\), we cannot directly minimise \(R(h)\). But, under the assumption that the training data are independent realisations from this distribution, the expectation of the empirical risk is in fact the generalisation risk.</p>
+<p>Therefore, we wish to find parameters for any model we construct which minimise the empirical risk, and hope that this leads to a low generalisation risk. </p>
+<h2><a class="header" href="#intuition-on-data-analysis" id="intuition-on-data-analysis">Intuition on Data Analysis</a></h2>
+<p>For \(n \leq 3\), classification can be understood visually: we can plot the points on a graph with their corresponding labels and try to devise a rule which distinguishes each class. In higher dimensions, the idea is the same, but we cannot just plot a graph to understand the geometry of the feature space. </p>
+<p>Many of the algorithms used in machine learning operate on simple principles. Support vector machines, for example, look for a <em>hyperplane</em> to separate the points of each class. If the data are <em>linearly separable</em>, in other words it's possible to find a hyperplane which splits the two groups, linear support vector machines can learn a rule with zero empirical risk.</p>
+<p>K Nearest Neighbours models are equally intuitive: given a point we want to classify, we simply look for \(k\) points nearby, and choose the most common label for all of those points.</p>
+<p>Part of the challenge of data science is to gain similar intuititon for data with tens, or hundreds, of dimensions, and understand the relationships, which may be highly non-linear.</p>
+<p>An interesting visualisation of the links between neural networks and topology is given in [3] which is well worth reading.</p>
+<p><small>[1] Roman Vershynin. <em>High-Dimensional Probability: An Introduction with Applications in Data Science</em>. Cambridge University Press, Cambridge. (2018)</small><br/>
+<small>[2] Vladimir N. Vapnik. <em>The Nature of Statistical Learning Theory</em>. 2nd ed. Springer, New York, NY. (2000)</small><br/>
+<small>[3] Christopher Olah. <em>Neural Networks, Manifolds, and Topology</em>. <a href="https://colah.github.io/posts/2014-03-NN-Manifolds-Topology/">URL</a>. (2014)</small></p>
+<h1><a class="header" href="#exploratory-data-analysis" id="exploratory-data-analysis">Exploratory Data Analysis</a></h1>
+<p>Before we go on to construct models on the dataset, we will first spend some time exploring the dataset to gain some intuition on which approaches ought to work best. This process is often called <em>exploratory data analysis</em> as developed by John W. Tukey [1, 2]. It allows us to seek to understand the data without having to develop a hypothesis or model <em>a priori</em> and testing if the data support such a hypothesis.</p>
+<p>Exploratory data analysis will be particularly important given we do not know much about the features. However, we need to be very careful about the problem of <strong>data leakage</strong> before we go ahead and draw conclusions from the data. </p>
+<h2><a class="header" href="#data-leakage" id="data-leakage">Data Leakage</a></h2>
+<p>To understand the problem of data leakage, we need to think about how our model will be used in practice:</p>
+<ol>
+<li>We select a model and fit its parameters using <em>training data</em> that we have collected.</li>
+<li>We then want to maximise its performance on unseen data in the future.</li>
+</ol>
+<p>We don't know anything about the data we will encounter in the future: whether our model is for predicting stock prices, supermarket demand or sentiment analysis, we don't have any information to go on other than what we've seen in the past, and what we reasonably expect to happen in the future.</p>
+<p>The first step above omits a large number of steps in statistics and data science. We cannot simply pick a model out of thin air in the hope that it will work well on future data: instead we need to have some way of measuring which models work best on the training data. </p>
+<p>This leads us to the idea of <em>cross-validation</em>. An excellent reference on this topic is [3, § 7.10]. As discussed in the section <em>Binary Classification</em>, so long as we may assume that the training data are independent realisations from the probability distribution, we can use the <em>empirical risk minimisation</em> principle to find a good model. To evaluate the performance of the model, we need some additional data independently drawn from the distribution that was not used to fit the model. We should not evaluate the final model performance on the data we trained from, as this will generally provide an estimate of the performance which is higher than the true performance on unseen data.</p>
+<p>The simplest solution is to choose a <em>hold-out</em> set from the data we have. Given the dataset \(D \subset \mathcal{X} \times \mathcal{Y}\), we split \(D\) into two smaller sets: a training set \(T\) and a validation set \(V\). We should take care to ensure that the way we split the data ensures the two sets have a similar class balance. Intuitively, a classifier could learn the wrong <em>prior probability</em> for each class if the ratios are different in the training and validation set.</p>
+<p>A slightly more sophisticated method splits the data into \(k\) <em>folds</em>, then trains on \(k - 1\) of these folds, while testing on the final fold. This allows us to construct multiple models by trying different combinations of folds: for example, we can split the data into 5 folds, train on 1–4 and test on 5. Or, we could train on 2–5 and test on 1. </p>
+<p><small>[1] John W. Tukey. <em>Exploratory Data Analysis</em>. Addison–Wesley, Reading, MA. (1977)</small><br/>
+<small>[2] <em>Exploratory Data Analysis</em>. In: <em>The Concise Encyclopedia of Statistics</em>. Springer, New York, NY. <a href="https://doi.org/10.1007/978-0-387-32833-1_136">DOI</a>. (2008)</small><br/>
+<small>[3] Trevor Hastie et al. <em>The Elements of Statistical Learning: Data Mining, Inference and Prediction</em>. 1st ed. Springer, New York, NY. (2001)</small></p>
+<h1><a class="header" href="#imbalanced-classes" id="imbalanced-classes">Imbalanced Classes</a></h1>
+<p>In this dataset, the <code>Class</code> feature tells us which transactions were deemed to be fraudulent, denoted class 1, and which were deemed genuine, denoted class 0. We can very quickly see that there are vastly more genuine transactions in the dataset than fraudulent ones.</p>
+<p><img src="images/class_balance.png" alt="Pie chart showing class balance (approximately 99.8% genuine)" /></p>
+<p>In the vast majority of cases, we will not be able to collect an equal number of points from each class. More unusual events such as spam or fraud are bound to show up less in data that we collect in a random sample. Very often, however, we care a lot more about the unusual events than the usual ones. [1]</p>
+<p>When classes are very imbalanced, we should be aware of what can go wrong.</p>
+<p><small>[1] Gary M. Weiss. &quot;Foundations of Imbalanced Learning&quot;. In: <em>Imbalanced Learning: Foundations, Algorithms, and Applications</em>. 1st ed. Wiley, Hoboken, NJ. (2013)</small></p>
+<h2><a class="header" href="#accuracy" id="accuracy">Accuracy</a></h2>
+<p>In a binary classification problem with imbalanced classes, we can very easily make a classifier that sounds impressive but is in fact trivial. Suppose we'd like to construct a spam filter, and we know that approximately 90% of emails received are not spam. Then by constructing a classifier that considers every e-mail to be genuine, we can attain an <em>accuracy</em> of 90%. It isn't hard to see that this is hugely misleading, because the spam filter does absolutely nothing.</p>
+<p>On our highly imbalanced dataset, the figures are even more misleading: we can attain an accuracy on the test set of about 99.8% by always labelling a transaction as genuine! It is clear that we need a different metric, because the difference between a bad classifier and the best possible classifier is just a change of 0.2% in the accuracy.</p>
+<p>In fact, giving the problem some thought, we realise that the good classifiers in this problem would be a compromise between finding as many of the fraudulent cases as possible, and keeping the number of false positives as low as possible. The former can be measured by the <em>precision</em> metric. Recall that, in our context, this represents the number of fraud predictions that actually were fraud. This takes values between 0 (every case we flagged as fraud was actually genuine) and 1 (every case we flagged as fraud was fraudulent). Ideally, we want this to be as high as we can get. </p>
+<p>The latter can be measured by <em>recall</em> of a classifier. This represents the fraction of fraudulent cases in the dataset that we correctly identify, and could also be called the <em>true positive rate</em>. Again, this takes values between 0 and 1, and we can trivially obtain a value of 1 by identifying every transaction as fraudulent. Such a classifier would have very low (but non-zero) precision as most of its predictions were wrong.</p>
+<p>While we are talking about binary classification (i.e. building a model to decide whether a transaction is <em>fraud</em> or <em>genuine</em>), the models we will explore don't simply give a value on the dichotomy. Instead, they use some sort of decision function or threshold. If we vary this cutoff, we can achieve different levels of precision and recall; for example, we might be able to sacrifice some precision but correctly recall a higher percentage of fraudulent transactions. These choices can be explored using the <em>precision–recall curve</em> and the <em>receiver operating characteristic curve</em>.</p>
+<h3><a class="header" href="#metrics" id="metrics">Metrics</a></h3>
+<p>Let \(h \colon \mathcal{X} \to \mathcal{Y} = \{0, 1\}\) be a classifier. We can formally define the recall metric with respect to a set of data \(D = \{ (x_1, y_1), \dots, (x_n, y_n) \}\) as
+\[ \mathrm{Recall}(h; D) = \sum_{i = 1}^n \frac{\mathbf{1} \{ h(x_i) = 1 \cap y_i = 1\}}{\mathbf{1} \{ y_i = 1\}}.\]
+Likewise, precision is defined as
+\[ \mathrm{Precision}(h; D) = \sum_{i = 1}^n \frac{\mathbf{1} \{ h(x_i) = 1 \cap y_i = 1\}}{\mathbf{1} \{ h(x_i) = 1\}}.\]
+In other words, precision estimates the probability that if \(Y = 1\) given \(h(X) = 1\). Recall estimates the probability that a given fraudulent transaction is detected.</p>
+<h3><a class="header" href="#roc-and-precisionrecall" id="roc-and-precisionrecall">ROC and Precision–Recall</a></h3>
+<p>The <em>receiver operating characteristic</em> (ROC) curve for a classifier compares the true and false positive rate for different thresholds of the classifier. The graph plots the false positive rate on the x-axis against the true positive rate on the y-axis, and the ideal classifier is represented by the point (0, 1). </p>
+<p>The <em>precision–recall</em> curve for a classifier plots the recall on the x-axis against the precision on the y-axis. The ideal classifier in this case is represented by the point (1, 1). Poor classifiers are ones with low precision or low recall. </p>
+<p>In fact, the two curves are rather intimately related [2]. If a classifier <em>dominates</em> the precision–recall space, in other words if the curve lies strictly above any other curve at all points, then it also dominates in ROC space. There is some debate whether the ROC curve or precision–recall curve should be preferred on imbalanced binary classification problems [3].</p>
+<p>Here are some examples of ROC and precision–recall curves. These were <strong>not</strong> generated from the same dataset, but give an idea of what to expect when plotting these curves for two different classifiers.</p>
+<p><img src="images/roc.png" alt="Example ROC curve comparing two classifiers" /></p>
+<p><img src="images/pr.png" alt="Example precision–recall curve comparing two classifiers" /></p>
+<p><small>[2] Jesse Davis and Mark Goadrich. &quot;The relationship between Precision-Recall and ROC curves&quot;. In: <i>Proceedings of the 23rd international conference on Machine learning</i> (<i>ICML '06</i>). Association for Computing Machinery, New York, NY, USA, pp. 233–240.  (2006). <a href="https://doi.org/10.1145/1143844.1143874">DOI</a></small><br/>
+<small>[3] Takaya Saito and Marc Rehmsmeier. <em>The precision-recall plot is more informative than the ROC plot when evaluating binary classifiers on imbalanced datasets</em>. PloS One 10.3, e0118432. (2015). <a href="https://doi.org/10.1371/journal.pone.0118432">DOI</a>.</small></p>
+<h2><a class="header" href="#models" id="models">Models</a></h2>
+<p>Imbalanced classes can be more difficult to learn for some models. An example of a model that might struggle is a \(k\)-nearest-neighbour classifier [4]. Depending on the geometry of the dataset, the larger class may dominate any predictions simply because there are so many more, but if we had a more balanced set, the minority class would be more easily predicted. </p>
+<p>There are often adaptations to the models we use which are intended to be able to deal with imbalanced classes more easily, such as weighting the neighbours as proposed in [4]. As discussed in the final section of the book, there are other approaches we could consider in order to balance the dataset in a model-agnostic way, such as <em>oversampling</em> or synthetic generation of new data.</p>
+<p><small>[4] Songbo Tan. <em>Neighbor-weighted K-nearest neighbor for unbalanced text corpus</em>. Expert Systems with Applications 28.4, pp. 667–671. <a href="https://doi.org/10.1016/j.eswa.2004.12.0230">DOI</a>. (2005).</small></p>
+<h1><a class="header" href="#seasonality" id="seasonality">Seasonality</a></h1>
+<p>We'll take a closer look at the <code>Time</code> feature in this section. Time series data is often interesting and is present is many datasets from various domains. The archetypal example for time series data is stock market pricing, where we want to predict the price of a stock at time \(T\) given knowledge of all times \(t \leq T\). </p>
+<h2><a class="header" href="#fraud-and-time" id="fraud-and-time">Fraud and Time</a></h2>
+<p>Intuitively, we might expect the fraud rate to vary over the course of a day. Perhaps fraudsters prefer to operate at night when the cardholder is asleep? Or, it might be the case that genuine transactions occur less at night, so the chance of a transaction being fraud increases.</p>
+<p>In our dataset, we are given the <code>Time</code> variable, which measures the time elapsed since the first transaction in the dataset. We don't know the date or time that the first transaction occurred, so we can't meaningfully reconstruct the times of each transaction. We can, however, break the data into 24 bins, each representing the number of hours (modulo 24) since the start of the dataset. </p>
+<pre><code class="language-python">from util import load_data
+import matplotlib.pyplot as plt
+
+X, y = load_data()
+X_fraud = X[y == 1]
+X_genuine = X[y == 0]
+
+# Create new numpy array representing the &quot;hour&quot; of the data relative to the starting time
+fraud_hour = (X_fraud.Time / 3600) % 24
+genuine_hour = (X_genuine.Time / 3600) % 24
+
+plt.hist([fraud_hour, genuine_hour], label=['Fraud', 'Genuine'], bins=24, density=True)
+plt.legend(loc='upper right')
+plt.xlabel('Hour bucket')
+plt.ylabel('Density')
+plt.xlim([0, 24])
+plt.title('Histogram comparing the density of fraud\n and genuine transactions per hour bucket')
+plt.show()
+</code></pre>
+<p><img src="images/hour_density.png" alt="Histogram of density of fraud vs genuine transactions by hour" /></p>
+<p>The data here represents the <em>density</em> of transactions, so we must bear in mind that in the observed data, genuine transactions will still be more common in every hour, but relatively speaking, the fraudulent transactions are a greater share of the total transactions in some hours (e.g. hours 1—7, where we see a large decline in genuine transactions and increase in fraudulent transactions).</p>
+<p>We should certainly expect the <code>Time</code> feature to be useful in the models that we construct, but it might be hard for learners to discover the seasonality pattern. We might need to encode this feature differently ourselves for the model to take full advantage of it. </p>
+<h1><a class="header" href="#baseline-model" id="baseline-model">Baseline Model</a></h1>
+<p>We're now ready to evaluate some models and see which seem to be most promising. We'll then take the models that perform best, try to understand why, and work to improve these models even further.</p>
+<p>As we discussed previously, we will perform cross-validation using a stratified \(k\)-fold method. As discussed in the <a href="eda_classes.html">Exploratory Data Analysis</a>, we will compare the classifiers using the precision–recall curve and the <em>average precision score</em>, which represents the area under the curve. The score gives us a single number to summarise the curve, and roughly speaking, larger scores are better.</p>
+<p>We will try a broad variety of &quot;off-the-shelf&quot; models which should give us a reasonable idea about which models are promising. In particular, we will try:</p>
+<ul>
+<li><strong>linear regression</strong> models;</li>
+<li><strong>random forest</strong> ensemble models;</li>
+<li><strong>neural network</strong> models;</li>
+<li><strong>neighbour</strong> models;</li>
+<li><strong>support vector machine</strong> models; and</li>
+<li><strong>naive Bayes</strong> models.</li>
+</ul>
+<pre><code class="language-python">import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neural_network import MLPClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.svm import LinearSVC
+from sklearn.model_selection import StratifiedKFold
+from sklearn.metrics import average_precision_score, precision_recall_curve
+from os import path
+from util import load_data, get_confidence, BOOK_PATH
+
+classifiers = [
+    ('Linear Regression', LinearRegression()),
+    ('Gaussian Naive Bayes', GaussianNB()),
+    ('Support Vector Machine', LinearSVC(dual=False)),
+    ('K Nearest Neighbours', KNeighborsClassifier()),
+    ('Neural Network', MLPClassifier(random_state=0)),
+    ('Random Forest', RandomForestClassifier(n_jobs=-1, random_state=0))
+]
+
+# load_data() is a helper to load the dataset into memory and partition into
+# features and targets. We will use this throughout and the full code is available
+# in the source folder.
+X, y = load_data()
+
+# We use a stratified fold to ensure that the class balance is preserved. 
+# Otherwise we could have the validation data having a greater or smaller
+# number of fraudulent cases, which would affect the generalisation score.
+k_fold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
+
+print('       Average precision score       ')
+print('-------------------------------------')
+print('Fold   Classifier               Score')
+for i, (train_index, test_index) in enumerate(k_fold.split(X, y)):
+    # Use the indices given by the StratifiedKFold to generate train and 
+    # test sets.
+    X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
+    y_train, y_test = y[train_index], y[test_index]
+
+    # Begin a new figure which will hold the precision–recall curve, then iterate
+    # through all classifiers to fit and test performance.
+    plt.figure()
+    for name, classifier in classifiers:
+        classifier.fit(X_train, y_train)
+        # get_confidence is another helper function. As some models can output scores using 
+        # predict_proba, while others only support decision_function (or in the case of using
+        # a regression model to estimate a score, predict), this function determines the 
+        # appropriate method of obtaining some numerical score from the model. 
+        #
+        # We will use get_confidence throughout the rest of this section.
+        y_score = get_confidence(classifier, X_test)
+        print(f'{i + 1:&lt;6} {name:&lt;24} {average_precision_score(y_test, y_score):.3f}')
+        # The precision_recall_curve will test the performance of the model at different
+        # thresholds.
+        curve = precision_recall_curve(y_test, y_score)
+        plt.plot(curve[0], curve[1], label=name)
+    # Label and save precision–recall plot.
+    plt.legend(loc='lower left')
+    plt.title(f'Fold {i + 1} precision—recall curve for baseline classification models')
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.savefig(path.join(BOOK_PATH, 'images', f'fold{i + 1}.png'))
+    print()
+
+</code></pre>
+<h3><a class="header" href="#output" id="output">Output</a></h3>
+<p><img src="images/fold1.png" alt="Results from Fold 1" />
+<img src="images/fold2.png" alt="Results from Fold 2" />
+<img src="images/fold3.png" alt="Results from Fold 3" />
+<img src="images/fold4.png" alt="Results from Fold 4" />
+<img src="images/fold5.png" alt="Results from Fold 5" /></p>
+<p>We see that the random forest classifier achieves the greatest area under the curve on every fold. The linear models are fairly 
+consistent and never perform too badly. An interesting case is the neural network, which tended to learn well on some folds, and on others performed extremely poorly. This might be because the training algorithm (which uses backpropagation behind the scenes) is finding a local minimum which turns out to be particularly poor.</p>
+<p>We'll certainly want to consider the random forest model going forward, but some experimentation might be needed in order to obtain good results from the other models.</p>
+<p>In the next section, we'll begin to preprocess the data by scaling it. This should prove to be an easy step which vastly increases the performance of some of our models.</p>
+<h1><a class="header" href="#scaling" id="scaling">Scaling</a></h1>
+<p>We saw before that the support vector machine method worked reasonably well, but was not an outstanding learner. Applying a scaling transformation to the data might help, in order to prevent features with large variation dominating those that vary little, even if small variations in that feature are actually significant. For example, Hastie et al. advise scaling when using neural network models in [1, § 11.5.3].</p>
+<p>Scaling the features will also mean that, in principle, the coefficients of a linear model should tell us roughly how important each feature is. There are various ways of scaling the data, but we will use scikit-learn's <code>StandardScaler</code> which centres the data (in other words, makes the mean zero) and scales by a constant in order to give each feature a variance of one.</p>
+<p><img src="images/hist_scaling_example.png" alt="Example of scaling. We see the mean of the data is now zero, and variance is one." /></p>
+<p>The above histogram shows an example of using <code>StandardScaler</code> on some random data generated from a distribution. Notice that the mean in the scaled data is now zero, and although the density appears similar, the variance is also much lower.</p>
+<p><small>[1] Trevor Hastie et al. <em>The Elements of Statistical Learning: Data Mining, Inference and Prediction</em>. 1st ed. Springer, New York, NY. (2001) </small></p>
+<h2><a class="header" href="#support-vector-machines-on-scaled-data" id="support-vector-machines-on-scaled-data">Support Vector Machines on Scaled Data</a></h2>
+<pre><code class="language-python">from sklearn.svm import SVC
+from sklearn.model_selection import StratifiedKFold
+from sklearn.metrics import average_precision_score, precision_recall_curve
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from util import load_data, get_confidence
+
+classifier = SVC()
+X, y = load_data()
+
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('clf', classifier)
+])
+
+k_fold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
+print('Average precision score  ')
+print('-------------')
+print('Fold   Score')
+for i, (train_index, test_index) in enumerate(k_fold.split(X, y)):
+    X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
+    y_train, y_test = y[train_index], y[test_index]
+    
+    pipeline.fit(X_train, y_train)
+    y_score = get_confidence(pipeline, X_test)
+    print(f'{i + 1:&lt;6} {average_precision_score(y_test, y_score):.3f}')
+    print()
+
+</code></pre>
+<h3><a class="header" href="#output-1" id="output-1">Output</a></h3>
+<pre><code>Average precision score
+-------------
+Fold   Score
+1      0.785
+
+2      0.839
+
+3      0.835
+
+4      0.843
+
+5      0.799
+</code></pre>
+<p>While the support vector machine still doesn't beat the random forest baseline model, it is a great improvement from before, where the area under the precision–recall curve was as poor as 0.561 on fold 4.</p>
+<h2><a class="header" href="#k-nearest-neighbours-on-scaled-data" id="k-nearest-neighbours-on-scaled-data">K Nearest Neighbours on Scaled Data</a></h2>
+<pre><code class="language-python">from sklearn.model_selection import StratifiedKFold
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import average_precision_score, precision_recall_curve
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from util import load_data, get_confidence
+
+X, y = load_data()
+
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('clf', KNeighborsClassifier())
+])
+
+k_fold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
+print('Average precision score  ')
+print('-------------')
+print('Fold   Score')
+for i, (train_index, test_index) in enumerate(k_fold.split(X, y)):
+    X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
+    y_train, y_test = y[train_index], y[test_index]
+    
+    pipeline.fit(X_train, y_train)
+    y_score = get_confidence(pipeline, X_test)
+    print(f'{i + 1:&lt;6} {average_precision_score(y_test, y_score):.3f}')
+    print()
+
+</code></pre>
+<h3><a class="header" href="#output-2" id="output-2">Output</a></h3>
+<pre><code>Average precision score
+-------------
+Fold   Score
+1      0.781
+
+2      0.828
+
+3      0.839
+
+4      0.814
+
+5      0.808
+</code></pre>
+<p>The K Nearest Neighbours model produces another model with performance comparable to the support vector machine model above. For comparison, without scaling the model performs extremely poorly, and achieves a score of 0.137 on fold 1. Therefore, we can see that scaling makes a very significant difference for many models.</p>
+<p>An idea that we will explore later is whether we can combine these different models to construct a more powerful learner. </p>
+<h2><a class="header" href="#neural-networks-on-scaled-data" id="neural-networks-on-scaled-data">Neural Networks on Scaled Data</a></h2>
+<pre><code class="language-python">from sklearn.neural_network import MLPClassifier
+from sklearn.model_selection import StratifiedKFold
+from sklearn.metrics import average_precision_score, precision_recall_curve
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from util import load_data, get_confidence
+
+classifier = MLPClassifier(hidden_layer_sizes=(10,), alpha=0.001, random_state=2)
+X, y = load_data()
+
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('clf', classifier)
+])
+
+k_fold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
+print('Average precision score  ')
+print('-------------')
+print('Fold   Score')
+for i, (train_index, test_index) in enumerate(k_fold.split(X, y)):
+    X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
+    y_train, y_test = y[train_index], y[test_index]
+    
+    pipeline.fit(X_train, y_train)
+    y_score = get_confidence(pipeline, X_test)
+    print(f'{i + 1:&lt;6} {average_precision_score(y_test, y_score):.3f}')
+    print()
+
+</code></pre>
+<h3><a class="header" href="#output-3" id="output-3">Output</a></h3>
+<pre><code>Average precision score
+-------------
+Fold   Score
+1      0.788
+
+2      0.868
+
+3      0.856
+
+4      0.836
+
+5      0.846
+</code></pre>
+<p>This classifier using the multi-layer perceptron has performed well on all folds, and gives the best average precision score on fold 2 of all the classifiers we've seen so far. However, some caution must be exercised. The model appears to be fairly sensitive to the initial random state we choose. Here are the results with <code>random_state=1</code>:</p>
+<pre><code>Average precision score
+-------------
+Fold   Score
+1      0.777
+
+2      0.860
+
+3      0.834
+
+4      0.823
+
+5      0.854
+</code></pre>
+<p>Later, we will discuss <em>regularisation</em> which can, among other things, be used to try and reduce the variance of the model.</p>
+<h1><a class="header" href="#feature-selection" id="feature-selection">Feature Selection</a></h1>
+<p>Not all the features in our dataset contribute equally to the model. In fact, some features may not be any use to the model at all, and simply add noise which could be misinterpreted and overfit upon by the learner.</p>
+<p>Linear models are very straightforward to understand as we can examine the coefficients we have fit. Other models such as neural network classifiers are generally much more difficult to interpret. We will use a variety of methods to determine which features seem to have more predictive power, and try to remove the features which offer little benefit.</p>
+<h2><a class="header" href="#feature-permutation" id="feature-permutation">Feature Permutation</a></h2>
+<p>We can apply a general method to any model in order to test how important a certain feature is. The idea is as follows:</p>
+<ol>
+<li>Construct a learner from the training data.</li>
+<li>Given test data \((x_1, y_1), \dots, (x_n, y_n)\) and a chosen feature \(k\), permute the \(k\)th feature of the samples so that they no longer correspond to the correct sample.</li>
+<li>Measure the drop in score of the learner between the unpermuted and permuted data. </li>
+</ol>
+<p>We can choose any arbitrary scoring method, but we will choose the average precision score to remain consistent with the previous experiments. A large decrease in score indicates that a feature seems important, and little change implies the feature has a small impact on the model. If the score increases, the learner would be more accurate by not considering that feature at all. That might be because it has overfit and learned noise in that feature; this is an issue we should be aware of to ensure our model can generalise.</p>
+<p>A similar approach is discussed in [1], and we use the Python <a href="https://eli5.readthedocs.io/en/latest/">ELI5</a> package to generate the feature importance values. </p>
+<p><small>[1] Leo Breiman. <em>Random Forests</em>. Machine Learning 45, pp. 5–32. (2001) <a href="https://link.springer.com/article/10.1023/A:1010933404324">URL</a></small></p>
+<h3><a class="header" href="#applying-feature-permutations-to-random-forests" id="applying-feature-permutations-to-random-forests">Applying Feature Permutations to Random Forests</a></h3>
+<p>As the random forest models performed best in the baseline model construction, we'll perform feature permutation on these to try and determine which features are proving to be the most influential.</p>
+<p>In the previous section, we discussed using <code>StandardScaler</code> in a pipeline. We won't do this for the below example because in principle, a random forest should not be affected by scaling the variables: the decision rules can easily be adapted by the model without the need to preprocess.</p>
+<pre><code class="language-python">from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import StratifiedKFold
+from sklearn.metrics import average_precision_score
+from eli5 import formatters
+from eli5.sklearn import PermutationImportance
+from util import load_data
+
+# This helper function can be passed to the PermutationImportance instance
+# so the feature importance weights represent the increase/decrease of the 
+# average precision score upon permutation of a given feature.
+def score(clf, X, y):
+    y_score = clf.predict_proba(X)[:, 1]
+    return average_precision_score(y, y_score)
+
+classifier = RandomForestClassifier(n_jobs=-1, random_state=0)
+
+X, y = load_data()
+# Use only the first 10,000 samples to speed up the process. Calculating
+# the feature importances takes a large amount of time because we 
+# must permute each feature and retrain.
+X = X[:10000]
+y = y[:10000]
+
+k_fold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
+for i, (train_index, test_index) in enumerate(k_fold.split(X, y)):
+    X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
+    y_train, y_test = y[train_index], y[test_index]
+    classifier.fit(X_train, y_train)
+    perm = PermutationImportance(classifier, scoring=score).fit(X_test, y_test)
+    # We will create an aggregate feature importance ranking by storing the weights from each fold
+    # as a dataframe and summing them all together.
+    if i == 0:
+        explanations = formatters.explain_weights_df(perm, feature_names=X_train.columns.to_numpy())
+        explanations.set_index('feature', inplace=True)
+    else:
+        explanation = formatters.explain_weights_df(perm, feature_names=X_train.columns.to_numpy())
+        explanation.set_index('feature', inplace=True)
+        explanations = explanations + explanation
+# Output the aggregate feature importances after sorting to show the highest ranked first.
+print(explanations.weight.sort_values(ascending=False))
+</code></pre>
+<h4><a class="header" href="#output-4" id="output-4">Output</a></h4>
+<pre><code>feature
+V12       3.402100e-01
+V14       1.212035e-01
+V17       8.958874e-02
+V11       6.773449e-02
+V10       4.367965e-02
+V3        3.511822e-02
+V4        3.028638e-02
+V9        1.818182e-02
+V16       1.515152e-02
+V7        7.878788e-03
+V13       6.060606e-03
+V6        4.545455e-03
+V8        3.636364e-03
+V15       1.616162e-03
+V2        9.090909e-04
+V28       1.554312e-16
+V1        1.332268e-16
+V18       1.110223e-16
+V22       8.881784e-17
+V19       0.000000e+00
+V23       0.000000e+00
+V25       0.000000e+00
+V21      -3.535354e-03
+V24      -4.444444e-03
+Time     -5.050505e-03
+V5       -6.666667e-03
+Amount   -8.080808e-03
+V27      -8.888889e-03
+V20      -9.595960e-03
+V26      -9.595960e-03
+Name: weight, dtype: float64
+</code></pre>
+<p>We can see that over all the folds, the features <code>V12</code>, <code>V14</code>, <code>V17</code>, <code>V11</code> and <code>V10</code> seemed to have the most predictive power. The features <code>V21</code> and the ones below actively harmed our model, and removing them would improve the area under the precision–recall curve.</p>
+<h2><a class="header" href="#regularised-models" id="regularised-models">Regularised Models</a></h2>
+<p>The idea of regularisation is rooted in <a href="https://en.wikipedia.org/wiki/Occam%27s_razor">Occam's razor</a>, or the principle that a simpler explanation should be favoured over a more complex one. This is highly relevant for machine learning models in order to prevent overfitting and extremely complex models.</p>
+<p>We can try to reduce overfitting and unnecessarily complex models by adding a <em>penalty</em> to large weights. In other words, we modify the algorithms we use so that a large weight is considered &quot;worse&quot; than a low weight, given equal performance. The challenge is to obtain the right balance between penalising weights and allowing a sufficiently complex model to explain the data well.</p>
+<p>Two popular regularisations schemes are to use the \( \ell^1 \) and \( \ell^2 \) norms, defined by
+\[ \lVert x \rVert_{\ell^1} = \sum_{i = 1}^n |x_i|, \]
+\[ \lVert x \rVert_{\ell^2} = \Bigg ( \sum_{i = 1}^n x_i^2 \Bigg )^\frac12. \]</p>
+<p>The \(\ell^1\) norm can be seen as penalising any weight, and so we tend to find that optimal values are <em>sparse</em> and contain many zeros. This idea can be exploited in combination with linear regression to find a linear model using a smaller number of coefficients: in effect, selecting the most powerful explanatory features.</p>
+<h3><a class="header" href="#lasso" id="lasso">LASSO</a></h3>
+<p>LASSO is a linear regression model which is broadly similar to the ordinary least squares regression method, with the added condition that the coeffients have a bounded \(\ell^1\) norm. So, the model looks for coefficients of the form
+\[ Y = \beta_0 + \beta_1 X_1 + \cdots + \beta_n X_n, \]
+and tries to minimise the least squares best fit line with the added condition that \( \lVert \beta \rVert_{\ell^1} \leq K\) for some chosen regularisation term \(K\). A more detailed derivation of the LASSO method can be found in [2, §3.4.3].</p>
+<p>We can use a LASSO regression model to suggest which features are most important in the linear regression model too. </p>
+<pre><code class="language-python">import pandas as pd
+from sklearn.linear_model import Lasso
+from sklearn.model_selection import StratifiedKFold
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import average_precision_score
+from util import load_data, get_confidence
+
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('clf', Lasso(alpha=0.005))
+])
+
+X, y = load_data()
+
+print('Average precision score  ')
+print('-------------')
+print('Fold   Score')
+k_fold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
+for i, (train_index, test_index) in enumerate(k_fold.split(X, y)):
+    X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
+    y_train, y_test = y[train_index], y[test_index]
+    pipeline.fit(X_train, y_train)
+    current_coeff = pd.Series(pipeline[1].coef_, X.columns)
+    if i == 0:
+        coeff = current_coeff
+    else:
+        coeff = coeff + current_coeff
+    
+    y_score = get_confidence(pipeline, X_test)
+    print(f'{i + 1:&lt;6} {average_precision_score(y_test, y_score):.3f}')
+print() 
+print(coeff.sort_values(ascending=False))
+</code></pre>
+<h4><a class="header" href="#output-5" id="output-5">Output</a></h4>
+<pre><code>1      0.661
+2      0.747
+3      0.692
+4      0.751
+5      0.690
+
+V11       0.007156
+V4        0.002706
+Amount    0.000000
+V15      -0.000000
+V1       -0.000000
+V2        0.000000
+V5       -0.000000
+V6       -0.000000
+V8        0.000000
+V9       -0.000000
+V13      -0.000000
+V28       0.000000
+Time     -0.000000
+V22       0.000000
+V25       0.000000
+V18      -0.000000
+V19       0.000000
+V27       0.000000
+V20       0.000000
+V26       0.000000
+V21       0.000000
+V23      -0.000000
+V24      -0.000000
+V7       -0.013871
+V3       -0.015057
+V16      -0.015804
+V10      -0.020023
+V12      -0.029102
+V14      -0.037817
+V17      -0.042780
+dtype: float64
+</code></pre>
+<p>A similar story emerges: <code>V17</code>, <code>V14</code>, <code>V11</code>, <code>V12</code> and <code>V4</code> seem to be a few of the most significant features. </p>
+<p><small>[2] Trevor Hastie et al. <em>The Elements of Statistical Learning: Data Mining, Inference and Prediction</em>. 1st ed. Springer, New York, NY. (2001)</small></p>
+<h2><a class="header" href="#dropping-features" id="dropping-features">Dropping Features</a></h2>
+<p>We can try to drop the features that we think are of low importance to see how much this affects the model. If the model improves, or doesn't get much worse, we might decide to choose the simpler model. </p>
+<p>Using scikit-learn's <code>SelectFromModel</code> we can programmatically choose which features are worth keeping.</p>
+<pre><code class="language-python">import pandas as pd
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+from sklearn.linear_model import Lasso
+from sklearn.model_selection import StratifiedKFold
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from sklearn.feature_selection import SelectFromModel
+from sklearn.metrics import average_precision_score
+from util import load_data, get_confidence
+
+pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('select', SelectFromModel(Lasso(alpha=0.005))),
+    ('clf', SVC())
+])
+
+X, y = load_data()
+
+print('Average precision score  ')
+print('-------------')
+print('Fold   Score')
+k_fold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
+for i, (train_index, test_index) in enumerate(k_fold.split(X, y)):
+    X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
+    y_train, y_test = y[train_index], y[test_index]
+    pipeline.fit(X_train, y_train)
+
+    y_score = get_confidence(pipeline, X_test)
+    print(f'{i + 1:&lt;6} {average_precision_score(y_test, y_score):.3f}')
+</code></pre>
+<h3><a class="header" href="#output-6" id="output-6">Output</a></h3>
+<pre><code>Average precision score
+-------------
+Fold   Score
+1      0.795
+2      0.830
+3      0.835
+4      0.839
+5      0.801
+</code></pre>
+<p>The support vector machine doesn't seem to have been affected much by the dropping of low importance features. We might want to keep this simpler model.</p>
+<h1><a class="header" href="#feature-engineering" id="feature-engineering">Feature Engineering</a></h1>
+<p>Feature engineering involves using the raw data in some way to construct new features, perhaps addind domain knowledge to the dataset where we have it. We'll explore some options we have to improve our models by preprocessing the data.</p>
+<h2><a class="header" href="#interaction-features" id="interaction-features">Interaction Features</a></h2>
+<p>We will explore the idea of <em>interaction features</em>, sometimes also called feature crosses [1]. The idea is to create new features that are the product of existing ones, such as a feature representing the value of <code>V1</code> multiplied by <code>V2</code>. This allows linear models to learn more complex functions of the input data. Some of our other methods such as the random forest classifier might not benefit as much because they can more easily represent features such as <code>V1 x V2</code>.</p>
+<p>To do this, we can use scikit-learn's <code>PolynomialFeatures</code> transformer. It is easy to chain this with a scaler using the <code>Pipeline</code> we introduced previously. We'll test this on a linear model as the interaction features are likely to benefit this type of model most.</p>
+<p><small>[1] Google Developers. <em>Feature Crosses</em>. In: <em>Machine Learning Crash Course</em>. <a href="https://developers.google.com/machine-learning/crash-course/feature-crosses/video-lecture">URL</a>. (2020)</small></p>
+<pre><code class="language-python">import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import StratifiedKFold
+from sklearn.metrics import average_precision_score, precision_recall_curve
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler, PolynomialFeatures
+from util import load_data, get_confidence
+
+X, y = load_data()
+
+pipeline = Pipeline([
+    ('poly', PolynomialFeatures(degree=2, interaction_only=True, include_bias=False)),
+    ('scaler', StandardScaler()),
+    ('clf', LinearRegression())
+])
+
+k_fold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
+print('Average precision score  ')
+print('-------------')
+print('Fold   Score')
+for i, (train_index, test_index) in enumerate(k_fold.split(X, y)):
+    X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
+    y_train, y_test = y[train_index], y[test_index]
+
+    pipeline.fit(X_train, y_train)
+    y_score = get_confidence(pipeline, X_test)
+    print(f'{i + 1:&lt;6} {average_precision_score(y_test, y_score):.3f}')
+    print()
+</code></pre>
+<h3><a class="header" href="#output-7" id="output-7">Output</a></h3>
+<pre><code>Average precision score
+-------------
+Fold   Score
+1      0.772
+
+2      0.838
+
+3      0.827
+
+4      0.848
+
+5      0.829
+</code></pre>
+<p>This is a good improvement on the linear model that did not contain the feature crosses. While the area under the precision–recall curve does not beat the random forest classifier, we've obtained another much-improved classifier.</p>
+<h2><a class="header" href="#encoding-time" id="encoding-time">Encoding Time</a></h2>
+<p>As discussed in the exploratory data analysis, there appears to be a pattern in the <code>Time</code> feature that we would like the model to consider, but it is less likely to be learned due to its complexity. We can try to add the time in seconds modulo 86400 (the number of seconds per day) to see if this allows the model to learn more easily.</p>
+<pre><code class="language-python">from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import StratifiedKFold
+from sklearn.metrics import average_precision_score, precision_recall_curve
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import StandardScaler
+from util import load_data, get_confidence
+
+classifier = RandomForestClassifier(n_jobs=-1, random_state=0)
+X, y = load_data()
+X['Time_mod'] = X.Time % 86400
+X.drop('Time', axis=1, inplace=True)
+
+k_fold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
+print('Average precision score  ')
+print('-------------')
+print('Fold   Score')
+for i, (train_index, test_index) in enumerate(k_fold.split(X, y)):
+    X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
+    y_train, y_test = y[train_index], y[test_index]
+
+    classifier.fit(X_train, y_train)
+    y_score = get_confidence(classifier, X_test)
+    print(f'{i + 1:&lt;6} {average_precision_score(y_test, y_score):.3f}')
+    print()
+
+</code></pre>
+<h3><a class="header" href="#output-8" id="output-8">Output</a></h3>
+<pre><code>Average precision score
+-------------
+Fold   Score
+1      0.829
+
+2      0.860
+
+3      0.836
+
+4      0.869
+
+5      0.851
+</code></pre>
+<p>The results give a mixed picture. While some folds saw an improvements, others saw a decline, so on balance it doesn't seem to matter too much whether we include the <code>Time</code> feature or not.</p>
+<h1><a class="header" href="#ensembles" id="ensembles">Ensembles</a></h1>
+<p>In the previous sections we've developed several models which all perform reasonably well. </p>
+<pre><code class="language-python">import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neural_network import MLPClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.svm import SVC
+from sklearn.model_selection import StratifiedKFold
+from sklearn.preprocessing import StandardScaler, PolynomialFeatures
+from sklearn.pipeline import Pipeline
+from sklearn.metrics import average_precision_score, precision_recall_curve
+from os import path
+from util import load_data, get_confidence, BOOK_PATH
+
+linear_pipeline = Pipeline([
+    ('poly', PolynomialFeatures(degree=2, interaction_only=True, include_bias=False)),
+    ('scaler', StandardScaler()),
+    ('clf', LinearRegression())
+])
+
+nn_pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('clf',  MLPClassifier(hidden_layer_sizes=(10,), alpha=0.001, random_state=2))
+])
+
+knn_pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('clf', KNeighborsClassifier())
+])
+
+svm_pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('clf', SVC())
+])
+
+classifiers = [
+    ('Linear Regression', linear_pipeline),
+    ('Neural Network', nn_pipeline),
+    ('KNN', knn_pipeline),
+    ('SVM', svm_pipeline),
+    ('Random Forest', RandomForestClassifier(n_jobs=-1, random_state=0))
+]
+
+X, y = load_data()
+
+k_fold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
+print('       Average precision score       ')
+print('-------------------------------------')
+print('Fold   Classifier               Score')
+for i, (train_index, test_index) in enumerate(k_fold.split(X, y)):
+    X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
+    y_train, y_test = y[train_index], y[test_index]
+    plt.figure()
+    for name, classifier in classifiers:
+        classifier.fit(X_train, y_train)
+        y_score = get_confidence(classifier, X_test)
+        print(f'{i + 1:&lt;6} {name:&lt;24} {average_precision_score(y_test, y_score):.3f}')
+        curve = precision_recall_curve(y_test, y_score)
+        plt.plot(curve[0], curve[1], label=name)
+    plt.legend(loc='lower left')
+    plt.title(f'Fold {i + 1} precision—recall curve for classification models')
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.savefig(path.join(BOOK_PATH, 'images', f'final_fold{i + 1}.png'))
+    print()
+
+</code></pre>
+<p><img src="images/final_fold1.png" alt="Results on fold 1 for refined classifiers" />
+<img src="images/final_fold2.png" alt="Results on fold 2 for refined classifiers" />
+<img src="images/final_fold3.png" alt="Results on fold 3 for refined classifiers" />
+<img src="images/final_fold4.png" alt="Results on fold 4 for refined classifiers" />
+<img src="images/final_fold5.png" alt="Results on fold 5 for refined classifiers" /></p>
+<p>All of these models are broadly comparable. The random forest still proves hard to beat, but generally the models all perform broadly 
+equivalently.</p>
+<p>We might now consider what's going wrong with these classifiers: which transactions cause problems? If they all fail on the same transactions, this might just mean they're difficult to learn. If not, we might be able to combine the learners into one which is more powerful than any individual classifier.</p>
+<h2><a class="header" href="#errors" id="errors">Errors</a></h2>
+<p>We investigate the idea we just mentioned: do the classifiers tend to predict the label incorrectly on the same transactions?</p>
+<pre><code class="language-python">import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neural_network import MLPClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+from sklearn.model_selection import StratifiedKFold
+from sklearn.preprocessing import StandardScaler, PolynomialFeatures
+from sklearn.pipeline import Pipeline
+from sklearn.metrics import precision_recall_curve, accuracy_score
+from util import load_data, get_confidence
+import itertools
+
+# We create popelines from the various successful models we've developed.
+linear_pipeline = Pipeline([
+    ('poly', PolynomialFeatures(degree=2, interaction_only=True, include_bias=False)),
+    ('scaler', StandardScaler()),
+    ('clf', LinearRegression())
+])
+
+nn_pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('clf',  MLPClassifier(hidden_layer_sizes=(10,), alpha=0.001, random_state=2))
+])
+
+knn_pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('clf', KNeighborsClassifier())
+])
+
+svm_pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('clf', SVC())
+])
+
+classifiers = [
+    ('Linear Regression', linear_pipeline),
+    ('Neural Network', nn_pipeline),
+    ('KNN', knn_pipeline),
+    ('SVM', svm_pipeline),
+    ('Random Forest', RandomForestClassifier(n_jobs=-1, random_state=0))
+]
+
+
+def find_best_threshold(y_true, y_score):
+    curve = precision_recall_curve(y_true, y_score)
+    thresholds = curve[2]
+    accuracy = []
+    for threshold in thresholds:
+        accuracy.append(accuracy_score(y_true, y_score &gt; threshold))
+    return thresholds[np.argmax(accuracy)]
+
+X, y = load_data()
+
+# We will collect the indices of the misclassified transactions (in fold 1) in
+# misclassified. We then plot a histogram which shows us how many times each transaction
+# was misclassified. We test using 5 classification pipelines, so if a transaction has
+# been misclassified by all 5, it will show as a bar of 5.
+misclassified = []
+k_fold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
+for i, (train_index, test_index) in enumerate(k_fold.split(X, y)):
+    # Only evaluate the first fold for brevity.
+    if i &gt; 0:
+        break
+    
+    X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
+    y_train, y_test = y[train_index], y[test_index]
+    for name, clf in classifiers:
+        clf.fit(X_train, y_train)
+        y_score = get_confidence(clf, X_test)
+        # We want to test each classifier on its most accurate threshold.
+        threshold = find_best_threshold(y_test, y_score)
+        # Creates a numpy array that is 1 if the corresponding transaction
+        # was correctly classified by clf.
+        classified_correctly = (y_score &gt; threshold) == y_test
+
+        # Find the indices of the misclassifications and append to the collection
+        # misclassified.
+        misclassifications = list(np.where(classified_correctly == 0)[0])
+        misclassified.append(misclassifications)
+        
+    # misclassified contains 5 lists: one from each classifier. We flatten this into a
+    # 1 dimensional list.
+    misclassified_transactions = list(itertools.chain.from_iterable(misclassified))
+    # Plot a histogram of the data to show the number of misclassifications.
+    plt.hist(misclassified_transactions, bins=len(misclassified_transactions))
+    plt.title('Number of times transaction misclassified by index')
+    plt.xlabel('Index')
+    plt.ylabel('Number of times misclassified')
+    plt.ylim([0, 5])
+    plt.show()
+
+</code></pre>
+<p><img src="images/ensemble_misclassifications.png" alt="Misclassification histogram" />
+We can see that using the predictions of multiple classifiers, quite a few of the misclassifications can be avoided. Further investigation indeed shows that while some transactions are classified wrong by nearly all the models (which we might suspect are &quot;hard&quot; to classify), others are modelled better by some learners than others.</p>
+<h2><a class="header" href="#hard-voting" id="hard-voting">Hard Voting</a></h2>
+<p>One way of combining the learners is to use scikit-learn's <code>VotingClassifier</code>. In effect, we construct multiple independent models, get a prediction from each, and choose the most common label. If there's a tie, we choose the majority class. This method is known as <em>hard voting</em>, and only requires classifiers that assign labels in \(\{0, 1\}\). The <code>VotingClassifier</code> also supports an alternative method known as <em>soft voting</em>, but this works best for classifiers which output predictions in \([0, 1]\) calibrated to probability estimates.</p>
+<pre><code class="language-python">from sklearn.linear_model import RidgeClassifier
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neural_network import MLPClassifier
+from sklearn.ensemble import RandomForestClassifier, VotingClassifier
+from sklearn.svm import SVC
+from sklearn.model_selection import StratifiedKFold
+from sklearn.preprocessing import StandardScaler, PolynomialFeatures
+from sklearn.pipeline import Pipeline
+from sklearn.metrics import precision_recall_fscore_support
+from util import load_data
+
+# To simplify usage in the VotingClassifier, we will use a RidgeClassifier instead of
+# a LinearRegression model. This should behave very similarly with the regularisation 
+# term so small.
+linear_pipeline = Pipeline([
+    ('poly', PolynomialFeatures(degree=2, interaction_only=True, include_bias=False)),
+    ('scaler', StandardScaler()),
+    ('clf', RidgeClassifier(alpha=0.00001))
+])
+
+nn_pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('clf',  MLPClassifier(hidden_layer_sizes=(10,), alpha=0.001, random_state=0))
+])
+
+knn_pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('clf', KNeighborsClassifier())
+])
+
+svm_pipeline = Pipeline([
+    ('scaler', StandardScaler()),
+    ('clf', SVC())
+])
+
+classifiers = [
+    ('Linear Model', linear_pipeline),
+    ('Neural Network', nn_pipeline),
+    ('KNN', knn_pipeline),
+    ('SVM', svm_pipeline),
+    ('Random Forest', RandomForestClassifier(n_jobs=-1, random_state=0))
+]
+
+voting_clf = VotingClassifier(classifiers)
+X, y = load_data()
+
+k_fold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
+for i, (train_index, test_index) in enumerate(k_fold.split(X, y)):
+    # For brevity, we will just test the model on the first fold.
+    if i &gt; 0:
+        break
+    X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
+    y_train, y_test = y[train_index], y[test_index]
+    voting_clf.fit(X_train, y_train)
+    y_pred = voting_clf.predict(X_test)
+    precision, recall, f_score, _ = precision_recall_fscore_support(y_test, y_pred)
+    # Precision, recall and f_score are calculated with respect to both classes,
+    # but we are only interested in the fraud class (1).
+    print(f'Precision: {precision[1]:.3f}')
+    print(f'Recall: {recall[1]:.3f}')
+    print(f'f-score: {f_score[1]:.3f}')
+
+</code></pre>
+<h3><a class="header" href="#output-9" id="output-9">Output</a></h3>
+<pre><code>Precision: 0.948
+Recall: 0.737
+f-score: 0.830
+</code></pre>
+<p>The voting classifer has a precision of 0.95 and a recall of 0.74. This means that almost all of the fraudulent cases flagged by the classifier are correct, at a cost of missing a larger fraction of the true fraud. Depending on business parameters, this might be preferable to a very high recall; we can easily obtain a recall in excess of 0.95 with the individual models, but precision is much lower. Depending on whether it is worse to miss fraud or falsely flag genuine transactions, we can choose the appropriate model.</p>
+<h1><a class="header" href="#frontiers-of-machine-learning" id="frontiers-of-machine-learning">Frontiers of Machine Learning</a></h1>
+<p>We will briefly discuss some of the alternative approaches we could explore with the dataset.</p>
+<h2><a class="header" href="#oversampling-and-undersampling" id="oversampling-and-undersampling">Oversampling and undersampling</a></h2>
+<p>To resolve the imbalanced class issue, we could try <em>oversampling</em> or <em>undersampling</em>. Undersampling refers to keeping only a fraction of the majority class (genuine transactions) so that the ratio between genuine and fraud is balanced. On our dataset, we would ignore the vast majority of the data if we undersampled. That may not be a bad thing in itself, but we would need to compare undersampling against doing no preprocessing to see which approach worked better.</p>
+<p>Oversampling involves adding additional samples to the dataset, which may consist of copies of the fraudulent transactions, or some samples generated from the existing ones. We could simply add random copies of the fraudulent samples to the dataset until we reached a balance, or try and perform some process to generate &quot;new&quot; data. One such approach is known as SMOTE [1], which was shown by the authors to perform better than undersampling on their datasets. More recent techniques include using a <em>generative adversarial network</em> to synthetically create new samples, as described in [2].</p>
+<p><small>[1] Nitesh Chawla et al. <em>SMOTE: Synthetic Minority Over-sampling Technique</em>. Journal of Artificial Intelligence Research 16, pp. 321–357. (2002)</small><br/>
+<small>[2] Georgios Douzas and Fernando Bacao. <em>Effective data generation for imbalanced learning using conditional generative adversarial networks</em>. Expert Systems with Applications 91, pp. 464—471. <a href="https://doi.org/10.1016/j.eswa.2017.09.030">DOI</a>. (2018)</small></p>
+<h2><a class="header" href="#autoencoders" id="autoencoders">Autoencoders</a></h2>
+<p>Instead of performing a traditional dimensionality reduction algorithm such as prinicpal component analysis, it is possible to use a neural network approach to <em>learn</em> an encoding of the features into a lower dimension. This type of network is known as an <em>autoencoder</em>, and dimensionality reduction using these is an active research topic. An overview of the topic is given in [3].</p>
+<p><small>[3] Wang et al. <em>Auto-encoder based dimensionality reduction</em>. Neurocomputing 184, pp. 232–242. (2016)</small></p>
+<h2><a class="header" href="#neural-networks" id="neural-networks">Neural Networks</a></h2>
+<p>We tried some simple multi-layer perceptron (MLP) neural networks, but finding a good neural network architecture is an art in itself. 
+Using packages such as <a href="https://keras.io/">Keras</a> and <a href="https://www.tensorflow.org/">TensorFlow</a>, we could experiment much further with 
+neural networks. It may be the case that a deeper approach would be able to learn patterns that were hard to learn in a single layer.</p>
+<p>In principle a single-layer feedforward neural network can approximate any continuous function: this is the celebrated <em>Universal Approximation Theorem</em>, derived independently by George Cybenko [4], Kurt Hornik et al. [5] and Ken-Ichi Funahashi [6] in the late 1980s. The results given do not say how well a single-layer network converges, however, and in practice a more reasonable network may need more layers in order to converge in a reasonable time.</p>
+<p><small>[4] George Cybenko. <em>Approximation by superpositions of a sigmoidal function</em>. Mathematics of Control, Signals and Systems 2, pp. 303–314. <a href="https://doi.org/10.1007/BF02551274">DOI</a>. (1989)</small><br/>
+<small>[5] Kurt Hornik et al. <em>Multilayer feedforward networks are universal approximators</em>. Neural networks 2.5, pp. 359–366. <a href="https://doi.org/10.1016/0893-6080(89)90020-8">DOI</a>. (1989)</small><br/>
+<small>[6] Ken-Ichi Funahashi. <em>On the approximate realization of continuous mappings by neural networks</em>. Neural Networks 2.3, pp. 183–192. <a href="https://doi.org/10.1016/0893-6080(89)90003-8">DOI</a>. (1989) </p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+
+                
+            </nav>
+
+        </div>
+
+        
+        <!-- Livereload script (if served using the cli tool) -->
+        <script type="text/javascript">
+            var socket = new WebSocket("ws://localhost:3000/__livereload");
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+        
+
+        
+
+        
+
+        
+        <script type="text/javascript">
+            window.playground_copyable = true;
+        </script>
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+        
+        <script type="text/javascript">
+        window.addEventListener('load', function() {
+            MathJax.Hub.Register.StartupHook('End', function() {
+                window.setTimeout(window.print, 100);
+            });
+        });
+        </script>
+        
+        
+
+    </body>
+</html>
