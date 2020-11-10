@@ -12,3 +12,8 @@ Usage of [Anaconda](https://www.anaconda.com/products/individual) is recommended
 
 **The dataset must also be downloaded separately**. This is due to technical constraints on the maximum allowed file size on GitHub.
 A zip archive can be downloaded directly from Kaggle by clicking [here](https://www.kaggle.com/mlg-ulb/creditcardfraud/download). Unzip the given CSV file as `creditcard.csv` in the same directory as this `README.md` file.
+
+In order to generate the accompanying book, use the [mdBook](https://github.com/rust-lang/mdBook) package. Binaries are available [here](https://github.com/rust-lang/mdBook/releases). To build the documentation, use:
+```shell
+mdbook build
+```
