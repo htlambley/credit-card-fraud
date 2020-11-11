@@ -1,5 +1,8 @@
 # Detecting Credit Card Fraud with Machine Learning
-A classification model for Worldline &amp; Université Libre de Bruxelles' credit card fraud dataset. 
+A classification model for Worldline & Université Libre de Bruxelles' credit card fraud dataset.
+
+### [Read the book](https://htlambley.github.io/credit-card-fraud/)
+This project comes with an accompanying *mdBook* which explains the methods used, contains results, and discussion on the theoretical aspects of the work.
 
 ## Installation and Usage
 This project requires Python 3 and the following packages:
