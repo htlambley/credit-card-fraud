@@ -980,13 +980,15 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 from util import load_data, get_confidence
 
+SECONDS_IN_DAY = 86400
+
 classifier = RandomForestClassifier(n_jobs=-1, random_state=0)
 X, y = load_data()
-X['Time_mod'] = X.Time % 86400
+X['Time_mod'] = X.Time % SECONDS_IN_DAY
 X.drop('Time', axis=1, inplace=True)
 
 k_fold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
-print('Average precision score  ')
+print('Average precision score')
 print('-------------')
 print('Fold   Score')
 for i, (train_index, test_index) in enumerate(k_fold.split(X, y)):
@@ -1300,21 +1302,6 @@ neural networks. It may be the case that a deeper approach would be able to lear
 
         </div>
 
-        
-        <!-- Livereload script (if served using the cli tool) -->
-        <script type="text/javascript">
-            var socket = new WebSocket("ws://localhost:3000/__livereload");
-            socket.onmessage = function (event) {
-                if (event.data === "reload") {
-                    socket.close();
-                    location.reload();
-                }
-            };
-
-            window.onbeforeunload = function() {
-                socket.close();
-            }
-        </script>
         
 
         

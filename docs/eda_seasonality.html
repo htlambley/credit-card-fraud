@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Introduction - Detecting Credit Card Fraud with Machine Learning</title>
+        <title>Seasonality - Detecting Credit Card Fraud with Machine Learning</title>
         
         
 
@@ -98,7 +98,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html" class="active"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="intro_background.html"><strong aria-hidden="true">1.1.</strong> Background</a></li><li class="chapter-item expanded "><a href="intro_dataset.html"><strong aria-hidden="true">1.2.</strong> Dataset</a></li></ol></li><li class="chapter-item expanded "><a href="binary_classification.html"><strong aria-hidden="true">2.</strong> Binary Classification</a></li><li class="chapter-item expanded "><a href="eda.html"><strong aria-hidden="true">3.</strong> Exploratory Data Analysis</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="eda_classes.html"><strong aria-hidden="true">3.1.</strong> Imbalanced Classes</a></li><li class="chapter-item expanded "><a href="eda_seasonality.html"><strong aria-hidden="true">3.2.</strong> Seasonality</a></li></ol></li><li class="chapter-item expanded "><a href="model_baseline.html"><strong aria-hidden="true">4.</strong> Baseline Model</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">5.</strong> Refining the Model</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="model_scaling.html"><strong aria-hidden="true">5.1.</strong> Scaling</a></li><li class="chapter-item expanded "><a href="model_feature_selection.html"><strong aria-hidden="true">5.2.</strong> Feature Selection</a></li><li class="chapter-item expanded "><a href="model_feature_engineering.html"><strong aria-hidden="true">5.3.</strong> Feature Engineering</a></li><li class="chapter-item expanded "><a href="model_ensemble.html"><strong aria-hidden="true">5.4.</strong> Ensembles</a></li></ol></li><li class="chapter-item expanded "><a href="frontiers.html"><strong aria-hidden="true">6.</strong> Frontiers of Machine Learning</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="intro_background.html"><strong aria-hidden="true">1.1.</strong> Background</a></li><li class="chapter-item expanded "><a href="intro_dataset.html"><strong aria-hidden="true">1.2.</strong> Dataset</a></li></ol></li><li class="chapter-item expanded "><a href="binary_classification.html"><strong aria-hidden="true">2.</strong> Binary Classification</a></li><li class="chapter-item expanded "><a href="eda.html"><strong aria-hidden="true">3.</strong> Exploratory Data Analysis</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="eda_classes.html"><strong aria-hidden="true">3.1.</strong> Imbalanced Classes</a></li><li class="chapter-item expanded "><a href="eda_seasonality.html" class="active"><strong aria-hidden="true">3.2.</strong> Seasonality</a></li></ol></li><li class="chapter-item expanded "><a href="model_baseline.html"><strong aria-hidden="true">4.</strong> Baseline Model</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">5.</strong> Refining the Model</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="model_scaling.html"><strong aria-hidden="true">5.1.</strong> Scaling</a></li><li class="chapter-item expanded "><a href="model_feature_selection.html"><strong aria-hidden="true">5.2.</strong> Feature Selection</a></li><li class="chapter-item expanded "><a href="model_feature_engineering.html"><strong aria-hidden="true">5.3.</strong> Feature Engineering</a></li><li class="chapter-item expanded "><a href="model_ensemble.html"><strong aria-hidden="true">5.4.</strong> Ensembles</a></li></ol></li><li class="chapter-item expanded "><a href="frontiers.html"><strong aria-hidden="true">6.</strong> Frontiers of Machine Learning</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -166,30 +166,46 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#introduction" id="introduction">Introduction</a></h1>
-<p>This book gives an overview of using machine learning techniques to classify a dataset of <strong>credit card transactions</strong> to try and detect fraudulent transactions. </p>
-<p>We will be using Python and the scikit-learn package [1] in our analysis. Many of the ideas we discuss can be explored in much greater detail in the references given in each section—many of the topics discussed here will only be covered in brief, but the literature is vast and rich on machine learning, growing rapidly each day.</p>
-<p><small>[1] Pedregosa et al. <em>Scikit-learn: Machine Learning in Python</em>. Journal of Machine Learning Research 12, pp. 2825–2830. (2011)</small></p>
-<h3><a class="header" href="#assumed-knowledge" id="assumed-knowledge">Assumed Knowledge</a></h3>
-<ul>
-<li>We'll be using Python, so a familiarity with the language is helpful.</li>
-<li>In order to discuss the algorithms and statistical techniques, we'll be using standard mathematical concepts and notation. We'll try to be rigorous but also explore the intuitive ideas behind the algorithms, most of which can be understood quite well graphically.</li>
-</ul>
-<h3><a class="header" href="#goals" id="goals">Goals</a></h3>
-<p>By the end of this book, we will have constructed a classifier using modern techniques that can achieve high accuracy in detecting fraud on the data we use. On the way, we'll discuss many interesting topics in machine learning and statistical analysis.</p>
-<h3><a class="header" href="#licence" id="licence">Licence</a></h3>
-<p>For the most recent copy of this book, see <a href="https://github.com/htlambley">https://github.com/htlambley</a>.</p>
-<p>I release all work in this book into the public domain as given by the <a href="https://unlicense.org/">Unlicense</a>. All images in this book were generated by myself using Python's <a href="https://matplotlib.org/">matplotlib</a>. </p>
-<p>The <a href="https://www.kaggle.com/mlg-ulb/creditcardfraud">dataset</a> is used under the <a href="https://opendatacommons.org/licenses/dbcl/1-0/">Database Contents License v1.0</a> and the rights remain with the Machine Learning Group, Université Libre de Bruxelles.</p>
+                        <h1><a class="header" href="#seasonality" id="seasonality">Seasonality</a></h1>
+<p>We'll take a closer look at the <code>Time</code> feature in this section. Time series data is often interesting and is present is many datasets from various domains. The archetypal example for time series data is stock market pricing, where we want to predict the price of a stock at time \(T\) given knowledge of all times \(t \leq T\). </p>
+<h2><a class="header" href="#fraud-and-time" id="fraud-and-time">Fraud and Time</a></h2>
+<p>Intuitively, we might expect the fraud rate to vary over the course of a day. Perhaps fraudsters prefer to operate at night when the cardholder is asleep? Or, it might be the case that genuine transactions occur less at night, so the chance of a transaction being fraud increases.</p>
+<p>In our dataset, we are given the <code>Time</code> variable, which measures the time elapsed since the first transaction in the dataset. We don't know the date or time that the first transaction occurred, so we can't meaningfully reconstruct the times of each transaction. We can, however, break the data into 24 bins, each representing the number of hours (modulo 24) since the start of the dataset. </p>
+<pre><code class="language-python">from util import load_data
+import matplotlib.pyplot as plt
+
+X, y = load_data()
+X_fraud = X[y == 1]
+X_genuine = X[y == 0]
+
+# Create new numpy array representing the &quot;hour&quot; of the data relative to the starting time
+fraud_hour = (X_fraud.Time / 3600) % 24
+genuine_hour = (X_genuine.Time / 3600) % 24
+
+plt.hist([fraud_hour, genuine_hour], label=['Fraud', 'Genuine'], bins=24, density=True)
+plt.legend(loc='upper right')
+plt.xlabel('Hour bucket')
+plt.ylabel('Density')
+plt.xlim([0, 24])
+plt.title('Histogram comparing the density of fraud\n and genuine transactions per hour bucket')
+plt.show()
+</code></pre>
+<p><img src="images/hour_density.png" alt="Histogram of density of fraud vs genuine transactions by hour" /></p>
+<p>The data here represents the <em>density</em> of transactions, so we must bear in mind that in the observed data, genuine transactions will still be more common in every hour, but relatively speaking, the fraudulent transactions are a greater share of the total transactions in some hours (e.g. hours 1—7, where we see a large decline in genuine transactions and increase in fraudulent transactions).</p>
+<p>We should certainly expect the <code>Time</code> feature to be useful in the models that we construct, but it might be hard for learners to discover the seasonality pattern. We might need to encode this feature differently ourselves for the model to take full advantage of it. </p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
+                            <a rel="prev" href="eda_classes.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
 
                         
-                            <a rel="next" href="intro_background.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="model_baseline.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -201,9 +217,13 @@
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
+                    <a rel="prev" href="eda_classes.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
 
                 
-                    <a rel="next" href="intro_background.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="model_baseline.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 
@@ -211,21 +231,6 @@
 
         </div>
 
-        
-        <!-- Livereload script (if served using the cli tool) -->
-        <script type="text/javascript">
-            var socket = new WebSocket("ws://localhost:3000/__livereload");
-            socket.onmessage = function (event) {
-                if (event.data === "reload") {
-                    socket.close();
-                    location.reload();
-                }
-            };
-
-            window.onbeforeunload = function() {
-                socket.close();
-            }
-        </script>
         
 
         

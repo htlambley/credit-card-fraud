@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Feature Engineering - Detecting Credit Card Fraud with Machine Learning</title>
+        <title>Background - Detecting Credit Card Fraud with Machine Learning</title>
         
         
 
@@ -98,7 +98,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="intro_background.html"><strong aria-hidden="true">1.1.</strong> Background</a></li><li class="chapter-item expanded "><a href="intro_dataset.html"><strong aria-hidden="true">1.2.</strong> Dataset</a></li></ol></li><li class="chapter-item expanded "><a href="binary_classification.html"><strong aria-hidden="true">2.</strong> Binary Classification</a></li><li class="chapter-item expanded "><a href="eda.html"><strong aria-hidden="true">3.</strong> Exploratory Data Analysis</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="eda_classes.html"><strong aria-hidden="true">3.1.</strong> Imbalanced Classes</a></li><li class="chapter-item expanded "><a href="eda_seasonality.html"><strong aria-hidden="true">3.2.</strong> Seasonality</a></li></ol></li><li class="chapter-item expanded "><a href="model_baseline.html"><strong aria-hidden="true">4.</strong> Baseline Model</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">5.</strong> Refining the Model</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="model_scaling.html"><strong aria-hidden="true">5.1.</strong> Scaling</a></li><li class="chapter-item expanded "><a href="model_feature_selection.html"><strong aria-hidden="true">5.2.</strong> Feature Selection</a></li><li class="chapter-item expanded "><a href="model_feature_engineering.html" class="active"><strong aria-hidden="true">5.3.</strong> Feature Engineering</a></li><li class="chapter-item expanded "><a href="model_ensemble.html"><strong aria-hidden="true">5.4.</strong> Ensembles</a></li></ol></li><li class="chapter-item expanded "><a href="frontiers.html"><strong aria-hidden="true">6.</strong> Frontiers of Machine Learning</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="intro_background.html" class="active"><strong aria-hidden="true">1.1.</strong> Background</a></li><li class="chapter-item expanded "><a href="intro_dataset.html"><strong aria-hidden="true">1.2.</strong> Dataset</a></li></ol></li><li class="chapter-item expanded "><a href="binary_classification.html"><strong aria-hidden="true">2.</strong> Binary Classification</a></li><li class="chapter-item expanded "><a href="eda.html"><strong aria-hidden="true">3.</strong> Exploratory Data Analysis</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="eda_classes.html"><strong aria-hidden="true">3.1.</strong> Imbalanced Classes</a></li><li class="chapter-item expanded "><a href="eda_seasonality.html"><strong aria-hidden="true">3.2.</strong> Seasonality</a></li></ol></li><li class="chapter-item expanded "><a href="model_baseline.html"><strong aria-hidden="true">4.</strong> Baseline Model</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">5.</strong> Refining the Model</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="model_scaling.html"><strong aria-hidden="true">5.1.</strong> Scaling</a></li><li class="chapter-item expanded "><a href="model_feature_selection.html"><strong aria-hidden="true">5.2.</strong> Feature Selection</a></li><li class="chapter-item expanded "><a href="model_feature_engineering.html"><strong aria-hidden="true">5.3.</strong> Feature Engineering</a></li><li class="chapter-item expanded "><a href="model_ensemble.html"><strong aria-hidden="true">5.4.</strong> Ensembles</a></li></ol></li><li class="chapter-item expanded "><a href="frontiers.html"><strong aria-hidden="true">6.</strong> Frontiers of Machine Learning</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -166,113 +166,27 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#feature-engineering" id="feature-engineering">Feature Engineering</a></h1>
-<p>Feature engineering involves using the raw data in some way to construct new features, perhaps addind domain knowledge to the dataset where we have it. We'll explore some options we have to improve our models by preprocessing the data.</p>
-<h2><a class="header" href="#interaction-features" id="interaction-features">Interaction Features</a></h2>
-<p>We will explore the idea of <em>interaction features</em>, sometimes also called feature crosses [1]. The idea is to create new features that are the product of existing ones, such as a feature representing the value of <code>V1</code> multiplied by <code>V2</code>. This allows linear models to learn more complex functions of the input data. Some of our other methods such as the random forest classifier might not benefit as much because they can more easily represent features such as <code>V1 x V2</code>.</p>
-<p>To do this, we can use scikit-learn's <code>PolynomialFeatures</code> transformer. It is easy to chain this with a scaler using the <code>Pipeline</code> we introduced previously. We'll test this on a linear model as the interaction features are likely to benefit this type of model most.</p>
-<p><small>[1] Google Developers. <em>Feature Crosses</em>. In: <em>Machine Learning Crash Course</em>. <a href="https://developers.google.com/machine-learning/crash-course/feature-crosses/video-lecture">URL</a>. (2020)</small></p>
-<pre><code class="language-python">import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import StratifiedKFold
-from sklearn.metrics import average_precision_score, precision_recall_curve
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler, PolynomialFeatures
-from util import load_data, get_confidence
-
-X, y = load_data()
-
-pipeline = Pipeline([
-    ('poly', PolynomialFeatures(degree=2, interaction_only=True, include_bias=False)),
-    ('scaler', StandardScaler()),
-    ('clf', LinearRegression())
-])
-
-k_fold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
-print('Average precision score  ')
-print('-------------')
-print('Fold   Score')
-for i, (train_index, test_index) in enumerate(k_fold.split(X, y)):
-    X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
-    y_train, y_test = y[train_index], y[test_index]
-
-    pipeline.fit(X_train, y_train)
-    y_score = get_confidence(pipeline, X_test)
-    print(f'{i + 1:&lt;6} {average_precision_score(y_test, y_score):.3f}')
-    print()
-</code></pre>
-<h3><a class="header" href="#output" id="output">Output</a></h3>
-<pre><code>Average precision score
--------------
-Fold   Score
-1      0.772
-
-2      0.838
-
-3      0.827
-
-4      0.848
-
-5      0.829
-</code></pre>
-<p>This is a good improvement on the linear model that did not contain the feature crosses. While the area under the precision–recall curve does not beat the random forest classifier, we've obtained another much-improved classifier.</p>
-<h2><a class="header" href="#encoding-time" id="encoding-time">Encoding Time</a></h2>
-<p>As discussed in the exploratory data analysis, there appears to be a pattern in the <code>Time</code> feature that we would like the model to consider, but it is less likely to be learned due to its complexity. We can try to add the time in seconds modulo 86400 (the number of seconds per day) to see if this allows the model to learn more easily.</p>
-<pre><code class="language-python">from sklearn.svm import SVC
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import StratifiedKFold
-from sklearn.metrics import average_precision_score, precision_recall_curve
-from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
-from util import load_data, get_confidence
-
-classifier = RandomForestClassifier(n_jobs=-1, random_state=0)
-X, y = load_data()
-X['Time_mod'] = X.Time % 86400
-X.drop('Time', axis=1, inplace=True)
-
-k_fold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
-print('Average precision score  ')
-print('-------------')
-print('Fold   Score')
-for i, (train_index, test_index) in enumerate(k_fold.split(X, y)):
-    X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
-    y_train, y_test = y[train_index], y[test_index]
-
-    classifier.fit(X_train, y_train)
-    y_score = get_confidence(classifier, X_test)
-    print(f'{i + 1:&lt;6} {average_precision_score(y_test, y_score):.3f}')
-    print()
-
-</code></pre>
-<h3><a class="header" href="#output-1" id="output-1">Output</a></h3>
-<pre><code>Average precision score
--------------
-Fold   Score
-1      0.829
-
-2      0.860
-
-3      0.836
-
-4      0.869
-
-5      0.851
-</code></pre>
-<p>The results give a mixed picture. While some folds saw an improvements, others saw a decline, so on balance it doesn't seem to matter too much whether we include the <code>Time</code> feature or not.</p>
+                        <h2><a class="header" href="#background" id="background">Background</a></h2>
+<p>In the UK, fraud losses totalled £620.6 million in 2019, with 2,745,539 recorded incidents occurring in that year alone [1, p. 13]. Over 98% of these losses were absorbed by banks and card issuers, and the remaining losses were paid by cardholders. </p>
+<p>These losses represent a huge problem in the form of lost profit and increased overhead costs for cardholders. Even small advances in the accuracy of fraud detection systems would cut down on these losses.</p>
+<p>There is certainly opportunity for improvement: while £999.2 million of fraudulent transactions were prevented by banks [1], this only accounts for about 62% of losses.</p>
+<p><img src="images/fraud_proportion.png" alt="Proportion of fraud in the UK in 2019. Pie chart shows 38.3% (£620.6 million) not prevented." /></p>
+<p>If one further percentage point of fraud could be prevented, this would reduce fraud losses by approximately £16 million (as of 2019) [1]. </p>
+<p>On the other hand, the savings in reduced fraud may not be worth it if this leads to increased payment friction. Inconvenience and declined card transactions also lead to lost business, so a compromise is needed.</p>
+<p><small>[1] UK Finance. <i>Fraud — The Facts 2020</i>. <a href="https://www.ukfinance.org.uk/system/files/Fraud-The-Facts-2020-FINAL-ONLINE-11-June.pdf">URL</a>.</small></p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="model_feature_selection.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="intro.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
                         
-                            <a rel="next" href="model_ensemble.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="intro_dataset.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -284,13 +198,13 @@ Fold   Score
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="model_feature_selection.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="intro.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a rel="next" href="model_ensemble.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="intro_dataset.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 
@@ -298,21 +212,6 @@ Fold   Score
 
         </div>
 
-        
-        <!-- Livereload script (if served using the cli tool) -->
-        <script type="text/javascript">
-            var socket = new WebSocket("ws://localhost:3000/__livereload");
-            socket.onmessage = function (event) {
-                if (event.data === "reload") {
-                    socket.close();
-                    location.reload();
-                }
-            };
-
-            window.onbeforeunload = function() {
-                socket.close();
-            }
-        </script>
         
 
         

@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Seasonality - Detecting Credit Card Fraud with Machine Learning</title>
+        <title>Exploratory Data Analysis - Detecting Credit Card Fraud with Machine Learning</title>
         
         
 
@@ -98,7 +98,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="intro_background.html"><strong aria-hidden="true">1.1.</strong> Background</a></li><li class="chapter-item expanded "><a href="intro_dataset.html"><strong aria-hidden="true">1.2.</strong> Dataset</a></li></ol></li><li class="chapter-item expanded "><a href="binary_classification.html"><strong aria-hidden="true">2.</strong> Binary Classification</a></li><li class="chapter-item expanded "><a href="eda.html"><strong aria-hidden="true">3.</strong> Exploratory Data Analysis</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="eda_classes.html"><strong aria-hidden="true">3.1.</strong> Imbalanced Classes</a></li><li class="chapter-item expanded "><a href="eda_seasonality.html" class="active"><strong aria-hidden="true">3.2.</strong> Seasonality</a></li></ol></li><li class="chapter-item expanded "><a href="model_baseline.html"><strong aria-hidden="true">4.</strong> Baseline Model</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">5.</strong> Refining the Model</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="model_scaling.html"><strong aria-hidden="true">5.1.</strong> Scaling</a></li><li class="chapter-item expanded "><a href="model_feature_selection.html"><strong aria-hidden="true">5.2.</strong> Feature Selection</a></li><li class="chapter-item expanded "><a href="model_feature_engineering.html"><strong aria-hidden="true">5.3.</strong> Feature Engineering</a></li><li class="chapter-item expanded "><a href="model_ensemble.html"><strong aria-hidden="true">5.4.</strong> Ensembles</a></li></ol></li><li class="chapter-item expanded "><a href="frontiers.html"><strong aria-hidden="true">6.</strong> Frontiers of Machine Learning</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="intro_background.html"><strong aria-hidden="true">1.1.</strong> Background</a></li><li class="chapter-item expanded "><a href="intro_dataset.html"><strong aria-hidden="true">1.2.</strong> Dataset</a></li></ol></li><li class="chapter-item expanded "><a href="binary_classification.html"><strong aria-hidden="true">2.</strong> Binary Classification</a></li><li class="chapter-item expanded "><a href="eda.html" class="active"><strong aria-hidden="true">3.</strong> Exploratory Data Analysis</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="eda_classes.html"><strong aria-hidden="true">3.1.</strong> Imbalanced Classes</a></li><li class="chapter-item expanded "><a href="eda_seasonality.html"><strong aria-hidden="true">3.2.</strong> Seasonality</a></li></ol></li><li class="chapter-item expanded "><a href="model_baseline.html"><strong aria-hidden="true">4.</strong> Baseline Model</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">5.</strong> Refining the Model</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="model_scaling.html"><strong aria-hidden="true">5.1.</strong> Scaling</a></li><li class="chapter-item expanded "><a href="model_feature_selection.html"><strong aria-hidden="true">5.2.</strong> Feature Selection</a></li><li class="chapter-item expanded "><a href="model_feature_engineering.html"><strong aria-hidden="true">5.3.</strong> Feature Engineering</a></li><li class="chapter-item expanded "><a href="model_ensemble.html"><strong aria-hidden="true">5.4.</strong> Ensembles</a></li></ol></li><li class="chapter-item expanded "><a href="frontiers.html"><strong aria-hidden="true">6.</strong> Frontiers of Machine Learning</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -166,46 +166,36 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#seasonality" id="seasonality">Seasonality</a></h1>
-<p>We'll take a closer look at the <code>Time</code> feature in this section. Time series data is often interesting and is present is many datasets from various domains. The archetypal example for time series data is stock market pricing, where we want to predict the price of a stock at time \(T\) given knowledge of all times \(t \leq T\). </p>
-<h2><a class="header" href="#fraud-and-time" id="fraud-and-time">Fraud and Time</a></h2>
-<p>Intuitively, we might expect the fraud rate to vary over the course of a day. Perhaps fraudsters prefer to operate at night when the cardholder is asleep? Or, it might be the case that genuine transactions occur less at night, so the chance of a transaction being fraud increases.</p>
-<p>In our dataset, we are given the <code>Time</code> variable, which measures the time elapsed since the first transaction in the dataset. We don't know the date or time that the first transaction occurred, so we can't meaningfully reconstruct the times of each transaction. We can, however, break the data into 24 bins, each representing the number of hours (modulo 24) since the start of the dataset. </p>
-<pre><code class="language-python">from util import load_data
-import matplotlib.pyplot as plt
-
-X, y = load_data()
-X_fraud = X[y == 1]
-X_genuine = X[y == 0]
-
-# Create new numpy array representing the &quot;hour&quot; of the data relative to the starting time
-fraud_hour = (X_fraud.Time / 3600) % 24
-genuine_hour = (X_genuine.Time / 3600) % 24
-
-plt.hist([fraud_hour, genuine_hour], label=['Fraud', 'Genuine'], bins=24, density=True)
-plt.legend(loc='upper right')
-plt.xlabel('Hour bucket')
-plt.ylabel('Density')
-plt.xlim([0, 24])
-plt.title('Histogram comparing the density of fraud\n and genuine transactions per hour bucket')
-plt.show()
-</code></pre>
-<p><img src="images/hour_density.png" alt="Histogram of density of fraud vs genuine transactions by hour" /></p>
-<p>The data here represents the <em>density</em> of transactions, so we must bear in mind that in the observed data, genuine transactions will still be more common in every hour, but relatively speaking, the fraudulent transactions are a greater share of the total transactions in some hours (e.g. hours 1—7, where we see a large decline in genuine transactions and increase in fraudulent transactions).</p>
-<p>We should certainly expect the <code>Time</code> feature to be useful in the models that we construct, but it might be hard for learners to discover the seasonality pattern. We might need to encode this feature differently ourselves for the model to take full advantage of it. </p>
+                        <h1><a class="header" href="#exploratory-data-analysis" id="exploratory-data-analysis">Exploratory Data Analysis</a></h1>
+<p>Before we go on to construct models on the dataset, we will first spend some time exploring the dataset to gain some intuition on which approaches ought to work best. This process is often called <em>exploratory data analysis</em> as developed by John W. Tukey [1, 2]. It allows us to seek to understand the data without having to develop a hypothesis or model <em>a priori</em> and testing if the data support such a hypothesis.</p>
+<p>Exploratory data analysis will be particularly important given we do not know much about the features. However, we need to be very careful about the problem of <strong>data leakage</strong> before we go ahead and draw conclusions from the data. </p>
+<h2><a class="header" href="#data-leakage" id="data-leakage">Data Leakage</a></h2>
+<p>To understand the problem of data leakage, we need to think about how our model will be used in practice:</p>
+<ol>
+<li>We select a model and fit its parameters using <em>training data</em> that we have collected.</li>
+<li>We then want to maximise its performance on unseen data in the future.</li>
+</ol>
+<p>We don't know anything about the data we will encounter in the future: whether our model is for predicting stock prices, supermarket demand or sentiment analysis, we don't have any information to go on other than what we've seen in the past, and what we reasonably expect to happen in the future.</p>
+<p>The first step above omits a large number of steps in statistics and data science. We cannot simply pick a model out of thin air in the hope that it will work well on future data: instead we need to have some way of measuring which models work best on the training data. </p>
+<p>This leads us to the idea of <em>cross-validation</em>. An excellent reference on this topic is [3, § 7.10]. As discussed in the section <em>Binary Classification</em>, so long as we may assume that the training data are independent realisations from the probability distribution, we can use the <em>empirical risk minimisation</em> principle to find a good model. To evaluate the performance of the model, we need some additional data independently drawn from the distribution that was not used to fit the model. We should not evaluate the final model performance on the data we trained from, as this will generally provide an estimate of the performance which is higher than the true performance on unseen data.</p>
+<p>The simplest solution is to choose a <em>hold-out</em> set from the data we have. Given the dataset \(D \subset \mathcal{X} \times \mathcal{Y}\), we split \(D\) into two smaller sets: a training set \(T\) and a validation set \(V\). We should take care to ensure that the way we split the data ensures the two sets have a similar class balance. Intuitively, a classifier could learn the wrong <em>prior probability</em> for each class if the ratios are different in the training and validation set.</p>
+<p>A slightly more sophisticated method splits the data into \(k\) <em>folds</em>, then trains on \(k - 1\) of these folds, while testing on the final fold. This allows us to construct multiple models by trying different combinations of folds: for example, we can split the data into 5 folds, train on 1–4 and test on 5. Or, we could train on 2–5 and test on 1. </p>
+<p><small>[1] John W. Tukey. <em>Exploratory Data Analysis</em>. Addison–Wesley, Reading, MA. (1977)</small><br/>
+<small>[2] <em>Exploratory Data Analysis</em>. In: <em>The Concise Encyclopedia of Statistics</em>. Springer, New York, NY. <a href="https://doi.org/10.1007/978-0-387-32833-1_136">DOI</a>. (2008)</small><br/>
+<small>[3] Trevor Hastie et al. <em>The Elements of Statistical Learning: Data Mining, Inference and Prediction</em>. 1st ed. Springer, New York, NY. (2001)</small></p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="eda_classes.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="binary_classification.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
                         
-                            <a rel="next" href="model_baseline.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="eda_classes.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -217,13 +207,13 @@ plt.show()
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="eda_classes.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="binary_classification.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a rel="next" href="model_baseline.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="eda_classes.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 
@@ -231,21 +221,6 @@ plt.show()
 
         </div>
 
-        
-        <!-- Livereload script (if served using the cli tool) -->
-        <script type="text/javascript">
-            var socket = new WebSocket("ws://localhost:3000/__livereload");
-            socket.onmessage = function (event) {
-                if (event.data === "reload") {
-                    socket.close();
-                    location.reload();
-                }
-            };
-
-            window.onbeforeunload = function() {
-                socket.close();
-            }
-        </script>
         
 
         

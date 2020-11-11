@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>Baseline Model - Detecting Credit Card Fraud with Machine Learning</title>
+        <title>Dataset - Detecting Credit Card Fraud with Machine Learning</title>
         
         
 
@@ -98,7 +98,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="intro_background.html"><strong aria-hidden="true">1.1.</strong> Background</a></li><li class="chapter-item expanded "><a href="intro_dataset.html"><strong aria-hidden="true">1.2.</strong> Dataset</a></li></ol></li><li class="chapter-item expanded "><a href="binary_classification.html"><strong aria-hidden="true">2.</strong> Binary Classification</a></li><li class="chapter-item expanded "><a href="eda.html"><strong aria-hidden="true">3.</strong> Exploratory Data Analysis</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="eda_classes.html"><strong aria-hidden="true">3.1.</strong> Imbalanced Classes</a></li><li class="chapter-item expanded "><a href="eda_seasonality.html"><strong aria-hidden="true">3.2.</strong> Seasonality</a></li></ol></li><li class="chapter-item expanded "><a href="model_baseline.html" class="active"><strong aria-hidden="true">4.</strong> Baseline Model</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">5.</strong> Refining the Model</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="model_scaling.html"><strong aria-hidden="true">5.1.</strong> Scaling</a></li><li class="chapter-item expanded "><a href="model_feature_selection.html"><strong aria-hidden="true">5.2.</strong> Feature Selection</a></li><li class="chapter-item expanded "><a href="model_feature_engineering.html"><strong aria-hidden="true">5.3.</strong> Feature Engineering</a></li><li class="chapter-item expanded "><a href="model_ensemble.html"><strong aria-hidden="true">5.4.</strong> Ensembles</a></li></ol></li><li class="chapter-item expanded "><a href="frontiers.html"><strong aria-hidden="true">6.</strong> Frontiers of Machine Learning</a></li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html"><strong aria-hidden="true">1.</strong> Introduction</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="intro_background.html"><strong aria-hidden="true">1.1.</strong> Background</a></li><li class="chapter-item expanded "><a href="intro_dataset.html" class="active"><strong aria-hidden="true">1.2.</strong> Dataset</a></li></ol></li><li class="chapter-item expanded "><a href="binary_classification.html"><strong aria-hidden="true">2.</strong> Binary Classification</a></li><li class="chapter-item expanded "><a href="eda.html"><strong aria-hidden="true">3.</strong> Exploratory Data Analysis</a></li><li><ol class="section"><li class="chapter-item expanded "><a href="eda_classes.html"><strong aria-hidden="true">3.1.</strong> Imbalanced Classes</a></li><li class="chapter-item expanded "><a href="eda_seasonality.html"><strong aria-hidden="true">3.2.</strong> Seasonality</a></li></ol></li><li class="chapter-item expanded "><a href="model_baseline.html"><strong aria-hidden="true">4.</strong> Baseline Model</a></li><li class="chapter-item expanded "><div><strong aria-hidden="true">5.</strong> Refining the Model</div></li><li><ol class="section"><li class="chapter-item expanded "><a href="model_scaling.html"><strong aria-hidden="true">5.1.</strong> Scaling</a></li><li class="chapter-item expanded "><a href="model_feature_selection.html"><strong aria-hidden="true">5.2.</strong> Feature Selection</a></li><li class="chapter-item expanded "><a href="model_feature_engineering.html"><strong aria-hidden="true">5.3.</strong> Feature Engineering</a></li><li class="chapter-item expanded "><a href="model_ensemble.html"><strong aria-hidden="true">5.4.</strong> Ensembles</a></li></ol></li><li class="chapter-item expanded "><a href="frontiers.html"><strong aria-hidden="true">6.</strong> Frontiers of Machine Learning</a></li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
         </nav>
@@ -166,107 +166,181 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1><a class="header" href="#baseline-model" id="baseline-model">Baseline Model</a></h1>
-<p>We're now ready to evaluate some models and see which seem to be most promising. We'll then take the models that perform best, try to understand why, and work to improve these models even further.</p>
-<p>As we discussed previously, we will perform cross-validation using a stratified \(k\)-fold method. As discussed in the <a href="eda_classes.html">Exploratory Data Analysis</a>, we will compare the classifiers using the precision–recall curve and the <em>average precision score</em>, which represents the area under the curve. The score gives us a single number to summarise the curve, and roughly speaking, larger scores are better.</p>
-<p>We will try a broad variety of &quot;off-the-shelf&quot; models which should give us a reasonable idea about which models are promising. In particular, we will try:</p>
-<ul>
-<li><strong>linear regression</strong> models;</li>
-<li><strong>random forest</strong> ensemble models;</li>
-<li><strong>neural network</strong> models;</li>
-<li><strong>neighbour</strong> models;</li>
-<li><strong>support vector machine</strong> models; and</li>
-<li><strong>naive Bayes</strong> models.</li>
-</ul>
-<pre><code class="language-python">import matplotlib.pyplot as plt
-from sklearn.linear_model import LinearRegression
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.neural_network import MLPClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.naive_bayes import GaussianNB
-from sklearn.svm import LinearSVC
-from sklearn.model_selection import StratifiedKFold
-from sklearn.metrics import average_precision_score, precision_recall_curve
-from os import path
-from util import load_data, get_confidence, BOOK_PATH
-
-classifiers = [
-    ('Linear Regression', LinearRegression()),
-    ('Gaussian Naive Bayes', GaussianNB()),
-    ('Support Vector Machine', LinearSVC(dual=False)),
-    ('K Nearest Neighbours', KNeighborsClassifier()),
-    ('Neural Network', MLPClassifier(random_state=0)),
-    ('Random Forest', RandomForestClassifier(n_jobs=-1, random_state=0))
-]
-
-# load_data() is a helper to load the dataset into memory and partition into
-# features and targets. We will use this throughout and the full code is available
-# in the source folder.
-X, y = load_data()
-
-# We use a stratified fold to ensure that the class balance is preserved. 
-# Otherwise we could have the validation data having a greater or smaller
-# number of fraudulent cases, which would affect the generalisation score.
-k_fold = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
-
-print('       Average precision score       ')
-print('-------------------------------------')
-print('Fold   Classifier               Score')
-for i, (train_index, test_index) in enumerate(k_fold.split(X, y)):
-    # Use the indices given by the StratifiedKFold to generate train and 
-    # test sets.
-    X_train, X_test = X.iloc[train_index, :], X.iloc[test_index, :]
-    y_train, y_test = y[train_index], y[test_index]
-
-    # Begin a new figure which will hold the precision–recall curve, then iterate
-    # through all classifiers to fit and test performance.
-    plt.figure()
-    for name, classifier in classifiers:
-        classifier.fit(X_train, y_train)
-        # get_confidence is another helper function. As some models can output scores using 
-        # predict_proba, while others only support decision_function (or in the case of using
-        # a regression model to estimate a score, predict), this function determines the 
-        # appropriate method of obtaining some numerical score from the model. 
-        #
-        # We will use get_confidence throughout the rest of this section.
-        y_score = get_confidence(classifier, X_test)
-        print(f'{i + 1:&lt;6} {name:&lt;24} {average_precision_score(y_test, y_score):.3f}')
-        # The precision_recall_curve will test the performance of the model at different
-        # thresholds.
-        curve = precision_recall_curve(y_test, y_score)
-        plt.plot(curve[0], curve[1], label=name)
-    # Label and save precision–recall plot.
-    plt.legend(loc='lower left')
-    plt.title(f'Fold {i + 1} precision—recall curve for baseline classification models')
-    plt.xlabel('Recall')
-    plt.ylabel('Precision')
-    plt.savefig(path.join(BOOK_PATH, 'images', f'fold{i + 1}.png'))
-    print()
-
+                        <h2><a class="header" href="#dataset" id="dataset">Dataset</a></h2>
+<p>We will study the <a href="https://www.kaggle.com/mlg-ulb/creditcardfraud">Credit Card Fraud</a> dataset and construct a model to detect fraudulent payments. This dataset was collected by <a href="https://uk.worldline.com/">Worldline</a> the <a href="https://mlg.ulb.ac.be/">Machine Learning Group</a> at the Université Libre de Bruxelles and later published on the data science platform <a href="https://kaggle.com">Kaggle</a>. We will start by viewing the first few rows of the dataset and getting a flavour of the information we have to work with.</p>
+<pre><code class="language-python">X, y = load_data()
+X.head()
 </code></pre>
-<h3><a class="header" href="#output" id="output">Output</a></h3>
-<p><img src="images/fold1.png" alt="Results from Fold 1" />
-<img src="images/fold2.png" alt="Results from Fold 2" />
-<img src="images/fold3.png" alt="Results from Fold 3" />
-<img src="images/fold4.png" alt="Results from Fold 4" />
-<img src="images/fold5.png" alt="Results from Fold 5" /></p>
-<p>We see that the random forest classifier achieves the greatest area under the curve on every fold. The linear models are fairly 
-consistent and never perform too badly. An interesting case is the neural network, which tended to learn well on some folds, and on others performed extremely poorly. This might be because the training algorithm (which uses backpropagation behind the scenes) is finding a local minimum which turns out to be particularly poor.</p>
-<p>We'll certainly want to consider the random forest model going forward, but some experimentation might be needed in order to obtain good results from the other models.</p>
-<p>In the next section, we'll begin to preprocess the data by scaling it. This should prove to be an easy step which vastly increases the performance of some of our models.</p>
+<div style="overflow-x: scroll">
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Time</th>
+      <th>V1</th>
+      <th>V2</th>
+      <th>V3</th>
+      <th>V4</th>
+      <th>V5</th>
+      <th>V6</th>
+      <th>V7</th>
+      <th>V8</th>
+      <th>V9</th>
+      <th>...</th>
+      <th>V21</th>
+      <th>V22</th>
+      <th>V23</th>
+      <th>V24</th>
+      <th>V25</th>
+      <th>V26</th>
+      <th>V27</th>
+      <th>V28</th>
+      <th>Amount</th>
+      <th>Class</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0.0</td>
+      <td>-1.359807</td>
+      <td>-0.072781</td>
+      <td>2.536347</td>
+      <td>1.378155</td>
+      <td>-0.338321</td>
+      <td>0.462388</td>
+      <td>0.239599</td>
+      <td>0.098698</td>
+      <td>0.363787</td>
+      <td>...</td>
+      <td>-0.018307</td>
+      <td>0.277838</td>
+      <td>-0.110474</td>
+      <td>0.066928</td>
+      <td>0.128539</td>
+      <td>-0.189115</td>
+      <td>0.133558</td>
+      <td>-0.021053</td>
+      <td>149.62</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0.0</td>
+      <td>1.191857</td>
+      <td>0.266151</td>
+      <td>0.166480</td>
+      <td>0.448154</td>
+      <td>0.060018</td>
+      <td>-0.082361</td>
+      <td>-0.078803</td>
+      <td>0.085102</td>
+      <td>-0.255425</td>
+      <td>...</td>
+      <td>-0.225775</td>
+      <td>-0.638672</td>
+      <td>0.101288</td>
+      <td>-0.339846</td>
+      <td>0.167170</td>
+      <td>0.125895</td>
+      <td>-0.008983</td>
+      <td>0.014724</td>
+      <td>2.69</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1.0</td>
+      <td>-1.358354</td>
+      <td>-1.340163</td>
+      <td>1.773209</td>
+      <td>0.379780</td>
+      <td>-0.503198</td>
+      <td>1.800499</td>
+      <td>0.791461</td>
+      <td>0.247676</td>
+      <td>-1.514654</td>
+      <td>...</td>
+      <td>0.247998</td>
+      <td>0.771679</td>
+      <td>0.909412</td>
+      <td>-0.689281</td>
+      <td>-0.327642</td>
+      <td>-0.139097</td>
+      <td>-0.055353</td>
+      <td>-0.059752</td>
+      <td>378.66</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1.0</td>
+      <td>-0.966272</td>
+      <td>-0.185226</td>
+      <td>1.792993</td>
+      <td>-0.863291</td>
+      <td>-0.010309</td>
+      <td>1.247203</td>
+      <td>0.237609</td>
+      <td>0.377436</td>
+      <td>-1.387024</td>
+      <td>...</td>
+      <td>-0.108300</td>
+      <td>0.005274</td>
+      <td>-0.190321</td>
+      <td>-1.175575</td>
+      <td>0.647376</td>
+      <td>-0.221929</td>
+      <td>0.062723</td>
+      <td>0.061458</td>
+      <td>123.50</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>2.0</td>
+      <td>-1.158233</td>
+      <td>0.877737</td>
+      <td>1.548718</td>
+      <td>0.403034</td>
+      <td>-0.407193</td>
+      <td>0.095921</td>
+      <td>0.592941</td>
+      <td>-0.270533</td>
+      <td>0.817739</td>
+      <td>...</td>
+      <td>-0.009431</td>
+      <td>0.798278</td>
+      <td>-0.137458</td>
+      <td>0.141267</td>
+      <td>-0.206010</td>
+      <td>0.502292</td>
+      <td>0.219422</td>
+      <td>0.215153</td>
+      <td>69.99</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<p>Some immediate observations:</p>
+<ul>
+<li>All the data is numeric, which means it will be very easy to input this into standard machine learning models.</li>
+<li>The only columns with an obvious name are <code>Time</code>, <code>Amount</code> and <code>Class</code>. In fact, the remaining features in this dataset are the result of <a href="https://en.wikipedia.org/wiki/Principal_component_analysis">Principal Component Analysis</a> which was done by the authors of the dataset. This ensures the privacy of the cardholders involved in the dataset, but means we cannot apply any outside knowledge to these features as we do not know the transformation applied.</li>
+</ul>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
                         
-                            <a rel="prev" href="eda_seasonality.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                            <a rel="prev" href="intro_background.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                                 <i class="fa fa-angle-left"></i>
                             </a>
                         
 
                         
-                            <a rel="next" href="model_scaling.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next" href="binary_classification.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
                         
@@ -278,13 +352,13 @@ consistent and never perform too badly. An interesting case is the neural networ
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
                 
-                    <a rel="prev" href="eda_seasonality.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                    <a rel="prev" href="intro_background.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
                         <i class="fa fa-angle-left"></i>
                     </a>
                 
 
                 
-                    <a rel="next" href="model_scaling.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next" href="binary_classification.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
                 
@@ -292,21 +366,6 @@ consistent and never perform too badly. An interesting case is the neural networ
 
         </div>
 
-        
-        <!-- Livereload script (if served using the cli tool) -->
-        <script type="text/javascript">
-            var socket = new WebSocket("ws://localhost:3000/__livereload");
-            socket.onmessage = function (event) {
-                if (event.data === "reload") {
-                    socket.close();
-                    location.reload();
-                }
-            };
-
-            window.onbeforeunload = function() {
-                socket.close();
-            }
-        </script>
         
 
         

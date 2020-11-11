@@ -5,5 +5,8 @@ multilingual = false
 src = "src"
 title = "Detecting Credit Card Fraud with Machine Learning"
 
+[build]
+build-dir = "../docs"
+
 [output.html]
 mathjax-support = true
